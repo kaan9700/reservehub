@@ -6,11 +6,11 @@ import {
     Input,
 
 } from "antd";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { REGISTER } from "../api/endpoints";
 import HeaderText from "./HeaderText";
 import { useNavigate } from 'react-router-dom';
-
+import AuthContext from "../auth/AuthProvider.jsx";
 
 const formItemLayout = {
     labelCol: {
@@ -28,7 +28,14 @@ const formItemLayout = {
 const SignUpForm = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const { user } = useContext(AuthContext)
     const navigate = useNavigate();
+
+    useEffect(()=>{
+        if(user){
+            navigate('/user')
+        }
+    }, [])
     const validatePhoneNumber = (_, value) => {
         // Regular expression to match a valid phone number format
         const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,7}$/im;
@@ -55,11 +62,12 @@ const SignUpForm = () => {
 
     return (
         <div
+            className={'form-wrapper'}
             style={{
-            display: "flex",
+                display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                marginTop: '15%',
+                marginTop: '5%',
             }}
             >
             <HeaderText title="Sign Up your Account" />

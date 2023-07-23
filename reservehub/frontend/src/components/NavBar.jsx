@@ -13,15 +13,14 @@ import {Menu} from "antd";
 import {useNavigate} from "react-router-dom";
 import logo from "../assets/logo.png";
 import {useLocation} from "react-router-dom";
-import {makePostRequest} from "../api/api";
-import {LOGOUT} from "../api/endpoints";
+import {useContext} from "react";
+import AuthContext from "../auth/AuthProvider.jsx";
 
 const NavBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const {isLoggedIn} = 'test';
-    const authDispatch = 'test';
+    const {user, logoutUser} = useContext(AuthContext)
     const current = location.pathname.slice(1);
     
     const onClick = (e) => {
@@ -29,26 +28,12 @@ const NavBar = () => {
     };
     
 
-    const logout = async () => {
-        const refreshToken = localStorage.getItem('refresh')
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        try {
-            await makePostRequest(LOGOUT, {'refresh': refreshToken});
-        } catch (e) {
-            console.log(e)
-        }
-    };
-
     const handleLogout = async () => {
-        if (authDispatch) {
-            authDispatch({type: 'logout'});
-            await logout();
-            navigate("/login");
+        if (user) {
+            logoutUser();
         } else {
             console.error("Auth dispatch function is undefined");
         }
-
     };
 
 
@@ -61,7 +46,7 @@ const NavBar = () => {
                         alt="logo"
                         style={{height: "50px", marginRight: "10px"}} // adjust as needed
                     />
-                    <span style={{fontSize: "24px"}}>AuthBuilder</span>
+                    <span style={{fontSize: "24px"}}>ReserveHub</span>
                 </div>
             ),
             key: "logo",
@@ -120,7 +105,7 @@ const NavBar = () => {
         },
     ];
 
-    const items = isLoggedIn
+    const items = user
         ? [...commonItems, ...loggedInItems]
         : [...commonItems, ...loggedOutItems];
 

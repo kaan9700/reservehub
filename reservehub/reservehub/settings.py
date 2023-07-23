@@ -1,7 +1,6 @@
 
 from pathlib import Path
 from datetime import timedelta
-from reservehub_app.utils import jwt_payload_handler
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -140,14 +139,14 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=360),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'TOKEN_OBTAIN_SERIALIZER': "reservehub_app.utils.MyTokenObtainPairSerializer"
 }
 
 
-JWT_AUTH = {
-    'JWT_PAYLOAD_HANDLER': jwt_payload_handler,
-}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
 from rest_framework_jwt.settings import api_settings
@@ -211,12 +211,11 @@ class TokenRefreshView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny, ]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh')
-            print(refresh_token)
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({'result': status.HTTP_200_OK})

@@ -1,7 +1,22 @@
-def jwt_payload_handler(user):
-    return {
-        'user_id': user.pk,
-        'email': user.email,
-        'role': 'Superuser' if user.is_superuser else ('Admin' if user.is_admin else 'User'),
-        'email_confirmed': user.email_confirmed,
-    }
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['email'] = user.email
+        if user.is_admin:
+            token['role'] = 'admin'
+        if user.is_superuser:
+            token['role'] = 'superadmin'
+        else:
+            token['role'] = 'user'
+
+        return token
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
