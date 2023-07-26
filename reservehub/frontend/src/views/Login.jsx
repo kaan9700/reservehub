@@ -1,6 +1,6 @@
 import { Form, Input, Button } from "antd";
 import { message } from "antd";
-import HeaderText from "./HeaderText";
+import HeaderText from "../components/HeaderText";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../auth/useAuth.jsx";
 import {useContext, useEffect} from "react";

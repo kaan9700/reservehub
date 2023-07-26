@@ -42,7 +42,7 @@ export const AuthProvider = ({children}) => {
 
     const logoutUser = async () => {
         try {
-            await makePostRequest(LOGOUT, {'acces': authTokens.access}, authTokens.access);
+            await makePostRequest(LOGOUT, {'acces': authTokens.access});
         } catch (e) {
             return
         }
@@ -54,10 +54,6 @@ export const AuthProvider = ({children}) => {
 
 
     const updateToken = async () => {
-        if (!authTokens?.refresh) {
-            setLoading(false)
-            return;
-        }
         const response = await fetch(BASE_URL + 'token/refresh', {
             method: 'POST',
             headers: {

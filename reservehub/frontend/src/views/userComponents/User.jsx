@@ -1,4 +1,4 @@
-import HeaderText from "../HeaderText";
+
 
 const User = () => {
     return (
@@ -12,7 +12,6 @@ const User = () => {
             }}
             >
 
-            <HeaderText title="Logged In" />
             <div className={'infofield'} style={{color: "black"}}>
                 <p>Admin</p>
                 <p>k.erbay@me.com</p>

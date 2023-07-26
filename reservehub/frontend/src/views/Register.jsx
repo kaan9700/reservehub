@@ -8,7 +8,7 @@ import {
 } from "antd";
 import { useState, useContext, useEffect } from "react";
 import { REGISTER } from "../api/endpoints";
-import HeaderText from "./HeaderText";
+import HeaderText from "../components/HeaderText";
 import { useNavigate } from 'react-router-dom';
 import AuthContext from "../auth/AuthProvider.jsx";
 

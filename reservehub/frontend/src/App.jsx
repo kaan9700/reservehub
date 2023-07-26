@@ -1,19 +1,19 @@
 import './App.css'
 import NavBar from "./components/NavBar.jsx";
 import {Route, Routes} from "react-router-dom";
-import Register from "./components/Register.jsx";
-import Login from "./components/Login.jsx";
+import Register from "./views/Register.jsx";
+import Login from "./views/Login.jsx";
 import PrivateRoutes from './components/PrivateRoutes.jsx'
 import {useContext} from "react";
 import AuthContext from "./auth/AuthProvider.jsx";
-import Superadmin from "./components/userComponents/Superadmin.jsx";
-import Admin from "./components/userComponents/Admin.jsx";
-import User from "./components/userComponents/User.jsx";
+import Superadmin from "./views/userComponents/Superadmin.jsx";
+import Admin from "./views/userComponents/Admin.jsx";
+import User from "./views/userComponents/User.jsx";
 import Test from "./components/Test.jsx";
 import AppFooter from "./components/Footer.jsx";
-import Home from "./components/Home.jsx";
-import About from "./components/About.jsx";
-import Services from "./components/Services.jsx";
+import Home from "./views/Home.jsx";
+import About from "./views/About.jsx";
+import Services from "./views/Services.jsx";
 
 function App() {
     const {user} = useContext(AuthContext)
@@ -29,12 +29,12 @@ function App() {
                 <Route path='/home' element={<Home/>}/>
                 <Route path='/about' element={<About/>}/>
                 <Route path='/services' element={<Services/>}/>
-
+z
                 <Route path='/user' element={<PrivateRoutes/>}>
 
                     <Route element={
-                        user && user.role === 'superadmin' ? <Superadmin/> :
-                        user && user.role === 'admin' ? <Admin/> :
+                        user && user.role === 'admin' ? <Superadmin/> :
+                        user && user.role === 'superadmin' ? <Admin/> :
                         <User/>
                                     } path='/user'/>
                 </Route>

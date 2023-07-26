@@ -1,6 +1,6 @@
 
 import { Button, Card, Col, Row, Typography } from 'antd';
-import SideBar from "../SideBar.jsx";
+import SideBar from "../../components/SideBar.jsx";
 
 const { Text } = Typography;
 

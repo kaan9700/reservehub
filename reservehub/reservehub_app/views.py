@@ -211,7 +211,7 @@ class TokenRefreshView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny, ]
 
     def post(self, request):
         try:
