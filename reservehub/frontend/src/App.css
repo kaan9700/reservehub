@@ -188,8 +188,24 @@ height: 100vh;
   margin-left: -20px;
   margin-right: -20px;
 
+
 }
 
 .ant-spin-nested-loading, .ant-spin-container, .ant-table, .ant-table-container, .ant-table-content, .ant-table-content table{
   height: 100%;
+}
+
+.userInfo-wrapper div span{
+  text-align: left;
+}
+
+.dashboard-userInfo-wrapper{
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-userInfo-wrapper div{
+  flex-grow: 1;
+}
+.dashboard-userInfo-wrapper div div{
+  back
 }
