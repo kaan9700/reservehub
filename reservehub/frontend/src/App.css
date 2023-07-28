@@ -3,7 +3,7 @@
 }
 
 html{
-  width: 100%;
+  height: 100vh;
 }
 
 :root {
@@ -33,8 +33,7 @@ a:hover {
 
 body {
   margin: 0;
-  /* place-items: center; */
-  min-width: 320px;
+  min-height: 100vh;
 }
 
 h1 {
@@ -83,7 +82,7 @@ button:focus-visible {
   text-align: center;
   display: flex;
   flex-flow: column;
-height: 100vh;
+  height: 100vh;
 }
 
 .logo {
@@ -206,6 +205,46 @@ height: 100vh;
 .dashboard-userInfo-wrapper div{
   flex-grow: 1;
 }
-.dashboard-userInfo-wrapper div div{
-  back
+.Sidebar-items-wrapper .ant-menu-title-content{
+  text-align: left;
+  padding-left: 10px;
 }
+
+.sidebar{
+  transition: all 0.1s ease-in-out;
+}
+
+.packageCard div{
+  display: flex;
+  flex-direction: column;
+}
+
+.package-title{
+  margin-top: 0;
+}
+
+.service-view {
+
+  display: flex;
+
+}
+.packageCard {
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.packageCard:hover {
+  transform: scale(1.1);
+}
+
+
+
+@media (max-width: 992px) {
+  .service-view {
+   flex-direction: column;
+  }
+.packageCard div{
+
+  }
+}
+

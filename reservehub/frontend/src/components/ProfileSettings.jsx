@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Checkbox, Input, Typography, Radio, Switch, Slider } from 'antd';
-
 const { Title, Paragraph } = Typography;
 
-const Settings = () => {
+const ProfileSettings = () => {
   const [textInput, setTextInput] = useState('');
   const [checkboxValue, setCheckboxValue] = useState(false);
   const [radioValue, setRadioValue] = useState(1);
@@ -11,10 +10,11 @@ const Settings = () => {
   const [sliderValue, setSliderValue] = useState(0);
 
   return (
-    <div>
+      <>
+
+        <Title level={3} className={'dashboard-title'} style={{textAlign: 'left', marginLeft: '10px'}}>Profil Einstellungen</Title>
       <Card>
-        <Title level={4}>App Einstellungen</Title>
-        <Paragraph>Benachrichtigungen</Paragraph>
+      <Paragraph>Benachrichtigungen</Paragraph>
         <Checkbox checked={checkboxValue} onChange={e => setCheckboxValue(e.target.checked)}>
           Benachrichtigungen einschalten
         </Checkbox>
@@ -37,8 +37,11 @@ const Settings = () => {
         <Paragraph>Profil Sichtbarkeit</Paragraph>
         <Slider value={sliderValue} onChange={value => setSliderValue(value)} />
       </Card>
-    </div>
+  </>
+
+
+
   );
 };
 
-export default Settings;
+export default ProfileSettings;

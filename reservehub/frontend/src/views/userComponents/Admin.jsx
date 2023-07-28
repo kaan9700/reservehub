@@ -3,7 +3,7 @@ import SideBar from "../../components/SideBar.jsx";
 import Dashboard from "../../components/Dashboard.jsx"
 import {Layout} from 'antd';
 import { useState, useEffect} from 'react'
-import Settings from '../../components/Settings.jsx'
+import ProfileSettings from '../../components/ProfileSettings.jsx'
 import Reservations from '../../components/Reservations.jsx'
 
 
@@ -31,14 +31,19 @@ const Admin = () => {
         case 'reservations':
             content = <Reservations />;
             break;
-        case 'settings':
-            content = <Settings />;
+        case 'profile-settings':
+            content = <ProfileSettings />;
+            break;
+        case 'app-settings':
+            content = <ProfileSettings />;
+            break;
+        case 'reservation-settings':
+            content = <ProfileSettings />;
             break;
         default:
         content = <Dashboard />;
     }
     return (
-            <>
                 <div className={'user-wrapper'}>
                     <SideBar onMenuSelect={handleMenuSelect} selectedItem={selectedMenuItem}/>
                     <div className={'content'}>
@@ -47,8 +52,6 @@ const Admin = () => {
                         </Layout>
                     </div>
                 </div>
-            </>
-            
             );
 };
 
