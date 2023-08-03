@@ -104,8 +104,8 @@ const SignInForm = () => {
           </a>
         </Form.Item>
 
-        <Form.Item style={{ display: 'flex', justifyContent: 'left'}}>
-          <Button type="primary" htmlType="submit" style={{ width: '10vw' }} >
+        <Form.Item style={{ display: 'flex', justifyContent: 'left', width: '100%'}}>
+          <Button type="primary" htmlType="submit" style={{ width: '115px' }} >
             Sign In
           </Button>
         </Form.Item>
