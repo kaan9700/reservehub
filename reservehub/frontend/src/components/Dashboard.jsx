@@ -27,7 +27,6 @@ ChartJS.register(
 
 
 const Dashboard = () => {
-    
     const data = [
         {key: '1', day: 'Heute', totalReservations: 20, maxReservation: 5},
         {key: '2', day: 'Morgen', totalReservations: 15, maxReservation: 4},
