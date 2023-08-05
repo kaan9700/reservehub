@@ -14,7 +14,8 @@ import AppFooter from "./components/Footer.jsx";
 import Home from "./views/Home.jsx";
 import About from "./views/About.jsx";
 import Services from "./views/Services.jsx";
-
+import ServiceInfo from "./views/ServiceInfo.jsx";
+import BuyView from "./views/BuyView.jsx";
 function App() {
     const {user} = useContext(AuthContext)
 
@@ -29,7 +30,10 @@ function App() {
                 <Route path='/home' element={<Home/>}/>
                 <Route path='/about' element={<About/>}/>
                 <Route path='/services' element={<Services/>}/>
-z
+                <Route path="/service/:id" element={<ServiceInfo />} />
+                <Route path="/buy/:id" element={<BuyView />} />
+
+
                 <Route path='/user' element={<PrivateRoutes/>}>
 
                     <Route element={
