@@ -22,7 +22,7 @@ export const AuthProvider = ({children}) => {
 
     const loginUser = async (values) => {
 
-        const response = await fetch(BASE_URL + 'token/', {
+        const response = await fetch(BASE_URL + 'login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export const AuthProvider = ({children}) => {
             localStorage.setItem('authTokens', JSON.stringify(data))
             navigate('/user')
         } else {
-            throw new Error('Benutzername oder Passwort ist falsch')
+            throw new Error(data.message)
         }
     }
 

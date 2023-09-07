@@ -50,8 +50,9 @@ const SignUpForm = () => {
         console.log("Received values of form: ", values);
         setLoading(true);
         try {
+            console.log(values);
             await makePostRequest(REGISTER, values);  // use values directly
-            message.success("Registration successful!");
+            message.success("Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse");
             form.resetFields();
             navigate('/login');
         } catch (error) {

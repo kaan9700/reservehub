@@ -17,7 +17,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils import timezone
 from rest_framework import status
 from django.shortcuts import render
-
+from .utils import MyTokenObtainPairSerializer
 
 
 @api_view(['GET'])
@@ -42,15 +42,32 @@ class RegisterView(APIView):
     def post(self, request):
         email = request.data['email']
         password = request.data['password']
+        password_confirmation = request.data['confirm']
+        phone = request.data.get('phone')
 
-        if email == "" or password == "":
-            return Response({'error': 'Username and password are required'}, status=400)
+        if not email:
+            return Response({'error': 'Bitte geben Sie eine E-Mail an'}, status=400)
+
+
+        if not password:
+            return Response({'error': 'Bitte geben Sie ein Passwort an'}, status=400)
+
+
+        if not phone:
+            return Response({'error': 'Bitte geben Sie eine Telefonnummer an'}, status=400)
+
+        if not password_confirmation:
+            return Response({'error': 'Bitte geben Sie die Passwortbestätigung an'}, status=400)
+
+        if password != password_confirmation:
+            return Response({'error': 'Passwörter stimmen nicht überein'}, status=400)
+
 
         if AppUser.objects.filter(email=email).exists():
-            return Response({"message": 'A user with this username already exists.'}, status=400)
+            return Response({"message": 'Ein Benutzer mit diesem Benutzernamen existiert bereits'}, status=400)
 
         try:
-            user = AppUser(email=email)
+            user = AppUser(email=email, phone=phone)
             user.set_password(password)
             user.save()
             # Call send_confirmation_email function after user is created
@@ -114,29 +131,20 @@ class LoginView(APIView):
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.email_confirmed:
+
             return Response({'message': 'E-Mail Adresse wurde nicht bestätigt'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
-        valid_password = user.check_password(password)
+        if not user.check_password(password):
+            return Response({'message': 'Das Passwort ist nicht korrekt'},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
-        if valid_password:
-            user.last_login = timezone.now()
-            user.save()
+        serializer = MyTokenObtainPairSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        else:
+            return Response(data={'message': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
 
-            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-            payload = jwt_payload_handler(user)
-            token = jwt_encode_handler(payload)
-
-            # Generate Refresh Token
-            refresh_token = RefreshToken.for_user(user)
-
-            return Response({'access': token, 'refresh': str(refresh_token)},
-                            status=status.HTTP_200_OK)
-
-        return Response({'message': 'Das Passwort ist nicht korrekt'},
-                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 class PasswordResetRequestView(APIView):

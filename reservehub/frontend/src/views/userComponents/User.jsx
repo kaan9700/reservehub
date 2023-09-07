@@ -13,7 +13,7 @@ const User = () => {
             >
 
             <div className={'infofield'} style={{color: "black"}}>
-                <p>Admin</p>
+                <p>test</p>
                 <p>k.erbay@me.com</p>
             </div>
 
