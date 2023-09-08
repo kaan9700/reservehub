@@ -1,5 +1,5 @@
 import { message } from "antd";
-import { makePostRequest } from "../api/api";
+import { makeRequest } from "../api/api";
 import {
     Button,
     Form,
@@ -51,7 +51,7 @@ const SignUpForm = () => {
         setLoading(true);
         try {
             console.log(values);
-            await makePostRequest(REGISTER, values);  // use values directly
+            await makeRequest('POST', REGISTER, values);  // use values directly
             message.success("Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse");
             form.resetFields();
             navigate('/login');

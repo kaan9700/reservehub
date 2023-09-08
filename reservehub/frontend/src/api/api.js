@@ -1,16 +1,14 @@
-async function makePostRequest(endpoint, data, token=false) {
+async function makeRequest(method, endpoint, data={}, token=false) {
     const headers = {
         'Content-Type': 'application/json'
     };
-
+    console.log(endpoint, data, token);
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // console.log('POST', data);
-
     const response = await fetch(endpoint, {
-        method: 'POST',
+        method: method, // Verwenden Sie die Methode aus den Parametern
         headers: headers,
         body: JSON.stringify(data)
     });
@@ -24,4 +22,5 @@ async function makePostRequest(endpoint, data, token=false) {
     return jsonData;
 }
 
-export {makePostRequest}
+
+export {makeRequest}

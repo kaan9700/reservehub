@@ -1,14 +1,12 @@
 import {createContext, useState, useEffect} from "react";
 import jwt_decode from "jwt-decode";
 import {useNavigate} from 'react-router-dom'
-import {makePostRequest} from "../api/api";
-import {LOGOUT} from "../api/endpoints";
-
+import {makeRequest} from "../api/api";
+import {LOGOUT, DELETEACCOUNT} from "../api/endpoints";
 
 
 const AuthContext = createContext();
 export default AuthContext;
-
 
 
 const BASE_URL = "http://localhost:8000/reservehub_app/"
@@ -42,7 +40,7 @@ export const AuthProvider = ({children}) => {
 
     const logoutUser = async () => {
         try {
-            await makePostRequest(LOGOUT, {'acces': authTokens.access});
+            await makeRequest('POST', LOGOUT, {'access': authTokens.access});
         } catch (e) {
             return
         }
@@ -77,6 +75,14 @@ export const AuthProvider = ({children}) => {
             setLoading(false)
         }
     }
+    const deleteAccount = async () => {
+        try {
+            await makeRequest('DELETE', DELETEACCOUNT, {}, authTokens.access);
+            logoutUser(); // Benutzer ausloggen und Token entfernen, nachdem das Konto gelöscht wurde
+        } catch (e) {
+            console.error("Fehler beim Löschen des Kontos:", e.message);
+        }
+    }
 
 
     let contextData = {
@@ -84,10 +90,12 @@ export const AuthProvider = ({children}) => {
         authTokens: authTokens,
         loginUser: loginUser,
         logoutUser: logoutUser,
+        deleteAccount: deleteAccount
     }
 
+
     useEffect(() => {
-        if(!authTokens){
+        if (!authTokens) {
             setLoading(false)
             return
         }
