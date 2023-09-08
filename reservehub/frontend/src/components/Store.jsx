@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Layout, Input, Select, Upload, Button, Modal, Form, Row, Col } from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 const { Content } = Layout;

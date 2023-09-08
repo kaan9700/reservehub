@@ -64,7 +64,7 @@ class RegisterView(APIView):
 
 
         if AppUser.objects.filter(email=email).exists():
-            return Response({"message": 'Ein Benutzer mit diesem Benutzernamen existiert bereits'}, status=400)
+            return Response({"message": 'Ein Konto mit diesem Benutzernamen existiert bereits'}, status=400)
 
         try:
             user = AppUser(email=email, phone=phone)
@@ -143,7 +143,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         else:
-            return Response(data={'message': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -152,7 +152,8 @@ class PasswordResetRequestView(APIView):
 
     def post(self, request):
         email = request.data.get('email')
-
+        if not email:
+            return Response({'message': 'Bitte geben Sie eine E-Mail Adresse an'}, status=400)
         associated_users = AppUser.objects.filter(email=email)
 
         if associated_users.exists():
@@ -171,7 +172,9 @@ class PasswordResetRequestView(APIView):
                 subject = ''.join(subject.splitlines())
                 email = render_to_string(email_template_name, c)
                 send_mail(subject, email, 'k.erbay9700@gmail.com', [user.email], fail_silently=False)
-        return Response({'result': 'Password reset email has been sent'}, status=200)
+            return Response({'message': 'E-Mail zum Zurücksetzen des Passworts wurde gesendet'}, status=200)
+        else:
+            return Response({'message': 'Es existiert kein Benutzer mit dieser E-Mail Adresse'}, status=400)
 
 
 

@@ -121,6 +121,7 @@ button:focus-visible {
 }
 
 .sidebar-wrapper {
+    background: white;
     width: fit-content;
     float: left;
 

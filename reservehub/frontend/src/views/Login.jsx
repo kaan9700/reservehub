@@ -1,5 +1,5 @@
 import { Form, Input, Button } from "antd";
-import { message } from "antd";
+import Notifications from "../components/Notifications.jsx";
 import HeaderText from "../components/HeaderText";
 import { useNavigate } from "react-router-dom";
 import {useContext, useEffect} from "react";
@@ -33,13 +33,13 @@ const SignInForm = () => {
     try {
       await loginUser(values)
     } catch (error) {
-      message.error(error.message);
+      Notifications('error', {'message': 'Fehler', 'description': error.message})
     }
   };
 
 
   const handleForgotPassword = () => {
-    navigate("/password_reset");
+    navigate("/password-reset");
   };
 
   return (

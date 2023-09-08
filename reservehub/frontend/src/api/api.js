@@ -1,8 +1,10 @@
+
+
 async function makeRequest(method, endpoint, data={}, token=false) {
     const headers = {
         'Content-Type': 'application/json'
     };
-    console.log(endpoint, data, token);
+
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }

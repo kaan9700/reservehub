@@ -16,6 +16,7 @@ import About from "./views/About.jsx";
 import Services from "./views/Services.jsx";
 import ServiceInfo from "./views/ServiceInfo.jsx";
 import BuyView from "./views/BuyView.jsx";
+import PasswordReset from "./views/PasswordReset.jsx";
 function App() {
     const {user} = useContext(AuthContext)
 
@@ -32,7 +33,7 @@ function App() {
                 <Route path='/services' element={<Services/>}/>
                 <Route path="/service/:id" element={<ServiceInfo />} />
                 <Route path="/buy/:id" element={<BuyView />} />
-
+                <Route path="/password-reset" element={<PasswordReset />} />
 
                 <Route path='/user' element={<PrivateRoutes/>}>
 

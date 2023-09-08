@@ -1,4 +1,4 @@
-import { message } from "antd";
+import Notifications from "../components/Notifications.jsx";
 import { makeRequest } from "../api/api";
 import {
     Button,
@@ -35,10 +35,10 @@ const SignUpForm = () => {
         if(user){
             navigate('/user')
         }
-    }, [])
+    }, [navigate, user])
     const validatePhoneNumber = (_, value) => {
         // Regular expression to match a valid phone number format
-        const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,7}$/im;
+        const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,7}$/im;
 
         if (value && !phoneRegex.test(value)) {
             return Promise.reject('Please enter a valid phone number!');
@@ -52,11 +52,12 @@ const SignUpForm = () => {
         try {
             console.log(values);
             await makeRequest('POST', REGISTER, values);  // use values directly
-            message.success("Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse");
+            Notifications('success', {'message': "Registrierung erfolgreich!", 'description': "Bitte bestätigen Sie Ihre E-Mail-Adresse"});
             form.resetFields();
             navigate('/login');
         } catch (error) {
-            message.error(`Registration failed: ${error.message}`);
+            Notifications('error', {'message': "Registrierung fehlgeschlagen!", 'description': error.message});
+            setLoading(false)
         }
         setLoading(false);
     };
