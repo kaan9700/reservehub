@@ -1,6 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+from datetime import timedelta
+from django.utils import timezone
+from django.contrib.auth.tokens import default_token_generator
+
+
 
 class AppUserManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -21,6 +26,17 @@ class AppUserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
+
+    def validate_token(self, user, token):
+        try:
+            token_model = PasswordResetToken.objects.get(user=user, token=token)
+        except PasswordResetToken.DoesNotExist:
+            return False
+
+        if timezone.now() - token_model.created_at > timedelta(minutes=15):
+            return False
+
+        return default_token_generator.check_token(user, token)
 
 class AppUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -47,4 +63,10 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
-    
+
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)

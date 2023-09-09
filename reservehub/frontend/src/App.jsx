@@ -17,6 +17,7 @@ import Services from "./views/Services.jsx";
 import ServiceInfo from "./views/ServiceInfo.jsx";
 import BuyView from "./views/BuyView.jsx";
 import PasswordReset from "./views/PasswordReset.jsx";
+import SetNewPassword from "./views/SetNewPassword.jsx";
 function App() {
     const {user} = useContext(AuthContext)
 
@@ -25,26 +26,29 @@ function App() {
         <>
             <NavBar/>
             <Routes>
-                <Route path='/test' element={<Test />} />
+                <Route path='/test' element={<Test/>}/>
                 <Route path='/register' element={<Register/>}/>
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/home' element={<Home/>}/>
                 <Route path='/about' element={<About/>}/>
                 <Route path='/services' element={<Services/>}/>
-                <Route path="/service/:id" element={<ServiceInfo />} />
-                <Route path="/buy/:id" element={<BuyView />} />
-                <Route path="/password-reset" element={<PasswordReset />} />
-
+                <Route path="/service/:id" element={<ServiceInfo/>}/>
+                <Route path="/buy/:id" element={<BuyView/>}/>
+                <Route path="/password-reset" element={<PasswordReset/>}/>
+                <Route
+                    path="/set_new_password/:uid/:token"
+                    element={<SetNewPassword/>}
+                />
                 <Route path='/user' element={<PrivateRoutes/>}>
 
                     <Route element={
                         user && user.role === 'admin' ? <Superadmin/> :
-                        user && user.role === 'superadmin' ? <Admin/> :
-                        <User/>
-                                    } path='/user'/>
+                            user && user.role === 'superadmin' ? <Admin/> :
+                                <User/>
+                    } path='/user'/>
                 </Route>
             </Routes>
-        <AppFooter />
+            <AppFooter/>
         </>
     )
 }

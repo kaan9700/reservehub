@@ -2,8 +2,11 @@ import { Form, Input, Button } from "antd";
 import Notifications from "../components/Notifications.jsx";
 import HeaderText from "../components/HeaderText";
 import { useNavigate } from "react-router-dom";
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import AuthContext from "../auth/AuthProvider.jsx";
+import LoadingIcon from "../components/Loader.jsx";
+
+
 
 const formItemLayout = {
   labelCol: {
@@ -21,6 +24,8 @@ const SignInForm = () => {
   const [form] = Form.useForm();
   const { loginUser, user } = useContext(AuthContext)
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(()=>{
     if(user){
@@ -29,12 +34,13 @@ const SignInForm = () => {
   }, [])
 
   const onFinish = async (values) => {
-
+  setLoading(true)
     try {
       await loginUser(values)
     } catch (error) {
       Notifications('error', {'message': 'Fehler', 'description': error.message})
     }
+    setLoading(false)
   };
 
 

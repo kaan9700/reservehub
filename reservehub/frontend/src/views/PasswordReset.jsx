@@ -4,6 +4,9 @@ import {useNavigate} from "react-router-dom";
 import {makeRequest} from "../api/api.js";
 import {PASSWORD_FORGOT} from "../api/endpoints.js";
 import Notifications from "../components/Notifications.jsx";
+import {useState} from "react";
+import LoadingIcon from "../components/Loader.jsx";
+
 
 const formItemLayout = {
     labelCol: {
@@ -19,21 +22,25 @@ const formItemLayout = {
 const PasswordReset = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
 
     const requestPasswordReset = async (values) => {
+        setLoading(true);
         try {
 
             await makeRequest('POST', PASSWORD_FORGOT, {'email': values.email});
 
-            Notifications('success', {'message': 'Erfolg', 'description': 'Eine E-Mail mit einem Bestätigungslink wurde an die angegebene E-Mail-Adresse gesendet'})
+            Notifications('success', {
+                'message': 'Erfolg',
+                'description': 'Eine E-Mail mit einem Bestätigungslink wurde an die angegebene E-Mail-Adresse gesendet'
+            })
             navigate('/login')
-
 
 
         } catch (error) {
             Notifications('error', {'message': 'Fehler', 'description': 'E-Mail nicht gefunden'})
         }
+        setLoading(false);
     };
 
     return (
@@ -77,8 +84,11 @@ const PasswordReset = () => {
                 </Form.Item>
 
                 <Form.Item style={{display: 'flex', justifyContent: 'left', width: '100%'}}>
-                    <Button type="primary" htmlType="submit" onSubmit={requestPasswordReset}>
-                        Bestätigungslink senden
+                    <Button type="primary" htmlType="submit" onSubmit={requestPasswordReset} style={{width: '200px'}}>
+                        {loading ? (
+                            <LoadingIcon/>
+                        ) : ('Bestätigungslink senden')}
+
                     </Button>
                 </Form.Item>
             </Form>

@@ -18,7 +18,7 @@ from django.utils import timezone
 from rest_framework import status
 from django.shortcuts import render
 from .utils import MyTokenObtainPairSerializer
-
+from .models import PasswordResetToken
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -165,9 +165,14 @@ class PasswordResetRequestView(APIView):
                     'token': default_token_generator.make_token(user),
                     'protocol': 'http',
                 }
+
+                token_model = PasswordResetToken(user=user, token=default_token_generator.make_token(user))
+                token_model.save()
+
                 subject_template_name='reservehub_app/reset_password_email_subject.txt'
                 email_template_name='reservehub_app/reset_password_email.html'
                 subject = render_to_string(subject_template_name, c)
+                print(subject)
                 # remove new lines from the subject
                 subject = ''.join(subject.splitlines())
                 email = render_to_string(email_template_name, c)
@@ -177,9 +182,9 @@ class PasswordResetRequestView(APIView):
             return Response({'message': 'Es existiert kein Benutzer mit dieser E-Mail Adresse'}, status=400)
 
 
-
 class PasswordResetConfirmView(APIView):
     permission_classes = (AllowAny,)
+
     def get(self, request, uidb64=None, token=None):
         context = {
             'uidb64': uidb64,
@@ -195,14 +200,28 @@ class PasswordResetConfirmView(APIView):
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             user = None
 
-        if user is not None and default_token_generator.check_token(user, token):
-            new_password = request.data.get('new_password')
-            print(new_password)
+        # Verwende die validate_token Methode, um den Token zu überprüfen
+        if user is not None and UserModel._default_manager.validate_token(user, token):
+            new_password = request.data.get('password')
+            confirmed_password = request.data.get('confirm')
+
+            if new_password != confirmed_password:
+                return Response({'message': 'Passwörter stimmen nicht überein'}, status=400)
+
             user.set_password(new_password)
             user.save()
-            return Response({'result': 'Password reset successful'}, status=200)
+
+            subject_template_name = 'reservehub_app/reset_password_email_subject.txt'
+            email_template_name = 'reservehub_app/reset_password_confirm_email.html'
+            subject = render_to_string(subject_template_name)
+            subject = ''.join(subject.splitlines())
+            email = render_to_string(email_template_name)
+
+            send_mail(subject, email, 'k.erbay9700@gmail.com', [user.email], fail_silently=False)
+            return Response({'message': 'Das Passwort wurde erfolgreich geändert'}, status=200)
         else:
-            return Response({'result': 'Password reset unsuccessful'}, status=400)
+            return Response({'message': 'Der Link zum Zurücksetzen Ihres Passworts ist abgelaufen. Bitte fordern Sie einen neuen an'},
+                            status=400)
 
 
 class TokenRefreshView(APIView):

@@ -317,3 +317,8 @@ button:focus-visible {
     flex: 0.9;
     margin-bottom: 50px
 }
+
+
+#set-new-password label{
+    float: left;
+}
