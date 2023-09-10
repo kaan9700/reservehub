@@ -27,11 +27,17 @@ class AppUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def validate_token(self, user, token):
-        try:
-            token_model = PasswordResetToken.objects.get(user=user, token=token)
-        except PasswordResetToken.DoesNotExist:
-            return False
+    def validate_token(self, user, token, type):
+        if type == 'delete':
+            try:
+                token_model = DeleteAccountToken.objects.get(user=user, token=token)
+            except DeleteAccountToken.DoesNotExist:
+                return False
+        else:
+            try:
+                token_model = PasswordToken.objects.get(user=user, token=token)
+            except PasswordToken.DoesNotExist:
+                return False
 
         if timezone.now() - token_model.created_at > timedelta(minutes=15):
             return False
@@ -66,7 +72,12 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
 
 
 
-class PasswordResetToken(models.Model):
+class PasswordToken(models.Model):
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class DeleteAccountToken(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)

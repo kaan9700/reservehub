@@ -1,4 +1,8 @@
 from django.contrib import admin
-from .models import AppUser  # Verwenden Sie das neue Modell AppUser
+from .models import AppUser, PasswordToken, DeleteAccountToken
 
 admin.site.register(AppUser)
+admin.site.register(PasswordToken)
+admin.site.register(DeleteAccountToken)
+
+

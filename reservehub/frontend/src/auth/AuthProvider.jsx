@@ -2,7 +2,7 @@ import {createContext, useState, useEffect} from "react";
 import jwt_decode from "jwt-decode";
 import {useNavigate} from 'react-router-dom'
 import {makeRequest} from "../api/api";
-import {LOGOUT, DELETEACCOUNT} from "../api/endpoints";
+import {LOGOUT, DELETE_ACCOUNT} from "../api/endpoints";
 
 
 const AuthContext = createContext();
@@ -75,14 +75,18 @@ export const AuthProvider = ({children}) => {
             setLoading(false)
         }
     }
+
+
     const deleteAccount = async () => {
         try {
-            await makeRequest('DELETE', DELETEACCOUNT, {}, authTokens.access);
-            logoutUser(); // Benutzer ausloggen und Token entfernen, nachdem das Konto gelöscht wurde
+            await makeRequest('POST', DELETE_ACCOUNT, {}, authTokens.access);
+            // logoutUser(); // Benutzer ausloggen und Token entfernen, nachdem das Konto gelöscht wurde
         } catch (e) {
             console.error("Fehler beim Löschen des Kontos:", e.message);
         }
     }
+
+
 
 
     let contextData = {

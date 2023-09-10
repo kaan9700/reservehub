@@ -6,5 +6,5 @@ export const SET_NEW_PASSWORD = BASE_URL + "password-reset-confirm/"
 
 export const LOGOUT = BASE_URL + "logout/"
 
-export const DELETEACCOUNT = BASE_URL + "delete-account/"
+export const DELETE_ACCOUNT = BASE_URL + "delete-account/"
 

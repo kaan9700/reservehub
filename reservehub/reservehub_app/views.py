@@ -18,7 +18,7 @@ from django.utils import timezone
 from rest_framework import status
 from django.shortcuts import render
 from .utils import MyTokenObtainPairSerializer
-from .models import PasswordResetToken
+from .models import PasswordToken
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -166,13 +166,13 @@ class PasswordResetRequestView(APIView):
                     'protocol': 'http',
                 }
 
-                token_model = PasswordResetToken(user=user, token=default_token_generator.make_token(user))
+                token_model = PasswordToken(user=user, token=default_token_generator.make_token(user))
                 token_model.save()
 
                 subject_template_name='reservehub_app/reset_password_email_subject.txt'
                 email_template_name='reservehub_app/reset_password_email.html'
                 subject = render_to_string(subject_template_name, c)
-                print(subject)
+
                 # remove new lines from the subject
                 subject = ''.join(subject.splitlines())
                 email = render_to_string(email_template_name, c)
@@ -255,12 +255,14 @@ class LogoutView(APIView):
 
 
 class DeleteAccountView(APIView):
-    permission_classes = [IsAuthenticated]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
+    permission_classes = [AllowAny]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
 
-    def delete(self, request):
-        user = request.user  # Der aktuell authentifizierte Benutzer
-        try:
-            user.delete()
-            return Response({"message": "Account erfolgreich gelöscht."}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+
+        return Response({'message': 'E-Mail zur Löschung des Kontos wurde gesendet'}, status=200)
+
+class DeleteAccountConfirmView(APIView):
+    permission_classes = [AllowAny]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
+
+    def post(self, request):
+        return Response({'message': 'E-Mail zur Löschung des Kontos wurde gesendet'}, status=200)

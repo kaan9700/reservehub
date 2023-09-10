@@ -5,6 +5,7 @@ import {Card, Button, Typography, Divider, Descriptions, Modal} from 'antd';
 import {json, useNavigate} from 'react-router-dom';
 import {ExclamationCircleFilled} from '@ant-design/icons';
 import AuthContext from "../../auth/AuthProvider.jsx";
+import Notifications from "../../components/Notifications.jsx";
 
 const {Title, Text} = Typography;
 const {confirm} = Modal;
@@ -17,7 +18,11 @@ const User = ({users}) => {
 
     const handleDeleteUser = async () => {
         if (user) {
-            deleteAccount();
+            let response = await deleteAccount();
+            const data = await response.json()
+            console.log(data)
+            Notifications('error', {'message': 'Fehler', 'description': response.message})
+
         } else {
             console.error("Auth dispatch function is undefined");
         }
