@@ -18,7 +18,7 @@ from django.utils import timezone
 from rest_framework import status
 from django.shortcuts import render
 from .utils import MyTokenObtainPairSerializer
-from .models import PasswordToken
+from .models import PasswordToken, DeleteAccountToken
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -127,7 +127,7 @@ class LoginView(APIView):
         user = AppUser.objects.filter(email=email).first()
 
         if user is None:
-            return Response({'message': 'Kein benutzer gefunden'},
+            return Response({'message': 'Kein Benutzer unter dieser Email gefunden'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.email_confirmed:
@@ -185,13 +185,6 @@ class PasswordResetRequestView(APIView):
 class PasswordResetConfirmView(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request, uidb64=None, token=None):
-        context = {
-            'uidb64': uidb64,
-            'token': token,
-        }
-        return render(request, 'password_reset_form.html', context)
-
     def post(self, request, uidb64=None, token=None):
         UserModel = AppUser
         try:
@@ -201,7 +194,7 @@ class PasswordResetConfirmView(APIView):
             user = None
 
         # Verwende die validate_token Methode, um den Token zu überprüfen
-        if user is not None and UserModel._default_manager.validate_token(user, token):
+        if user is not None and UserModel._default_manager.validate_token(user, token, 'reset'):
             new_password = request.data.get('password')
             confirmed_password = request.data.get('confirm')
 
@@ -255,14 +248,58 @@ class LogoutView(APIView):
 
 
 class DeleteAccountView(APIView):
-    permission_classes = [AllowAny]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
+    permission_classes = [IsAuthenticated]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
 
     def post(self, request):
+        email = request.user  # Der aktuell authentifizierte Benutzer
+        if not email:
+            return Response({'message': 'Ein Fehler ist aufgetreten, bitte versuchen Sie es später wieder'}, status=400)
+        associated_users = AppUser.objects.filter(email=email)
 
-        return Response({'message': 'E-Mail zur Löschung des Kontos wurde gesendet'}, status=200)
+        if associated_users.exists():
+            for user in associated_users:
+                c = {
+                    'email': user.email,
+                    'domain': 'localhost:3000',
+                    'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                    'protocol': 'http',
+                }
+                token_model = DeleteAccountToken(user=user, token=default_token_generator.make_token(user))
+                token_model.save()
+
+                subject_template_name = 'reservehub_app/delete_account_subject.txt'
+                email_template_name = 'reservehub_app/delete_account_email.html'
+                subject = render_to_string(subject_template_name, c)
+                # remove new lines from the subject
+                subject = ''.join(subject.splitlines())
+                email = render_to_string(email_template_name, c)
+                send_mail(subject, email, 'k.erbay9700@gmail.com', [user.email], fail_silently=False)
+
+            return Response({'message': 'E-Mail zur Löschung des Kontos wurde gesendet'}, status=200)
+        else:
+            return Response({'message': 'Es existiert kein Benutzer mit dieser E-Mail Adresse'}, status=400)
+
 
 class DeleteAccountConfirmView(APIView):
     permission_classes = [AllowAny]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
 
-    def post(self, request):
-        return Response({'message': 'E-Mail zur Löschung des Kontos wurde gesendet'}, status=200)
+    def post(self, request, uidb64=None, token=None):
+        UserModel = AppUser
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = UserModel._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            user = None
+
+        # Verwende die validate_token Methode, um den Token zu überprüfen
+        if user is not None and UserModel._default_manager.validate_token(user, token, 'delete'):
+            try:
+                user.delete()
+                return Response({"message": "Account erfolgreich gelöscht."}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Füge einen Standardfall hinzu
+        return Response({"message": "Ungültiger Token oder Benutzer existiert nicht."},
+                        status=status.HTTP_400_BAD_REQUEST)

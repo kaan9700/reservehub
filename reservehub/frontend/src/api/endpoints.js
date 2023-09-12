@@ -8,3 +8,4 @@ export const LOGOUT = BASE_URL + "logout/"
 
 export const DELETE_ACCOUNT = BASE_URL + "delete-account/"
 
+export const DELETE_ACCOUNT_CONFIRM = BASE_URL + "delete-account-confirm/"

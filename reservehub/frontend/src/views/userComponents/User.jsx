@@ -6,6 +6,7 @@ import {json, useNavigate} from 'react-router-dom';
 import {ExclamationCircleFilled} from '@ant-design/icons';
 import AuthContext from "../../auth/AuthProvider.jsx";
 import Notifications from "../../components/Notifications.jsx";
+import LoadingIcon from "../../components/Loader.jsx";
 
 const {Title, Text} = Typography;
 const {confirm} = Modal;
@@ -14,18 +15,18 @@ const {confirm} = Modal;
 const User = ({users}) => {
 
     const navigate = useNavigate();
-    const {user, deleteAccount} = useContext(AuthContext)
-
+    const {user, deleteAccount, logoutUser} = useContext(AuthContext)
+    const [loading, setLoading] = useState(false);
     const handleDeleteUser = async () => {
+        setLoading(true);
         if (user) {
             let response = await deleteAccount();
-            const data = await response.json()
-            console.log(data)
             Notifications('error', {'message': 'Fehler', 'description': response.message})
 
         } else {
             console.error("Auth dispatch function is undefined");
         }
+        setLoading(false);
     };
 
 
@@ -34,9 +35,10 @@ const User = ({users}) => {
             title: 'Wollen Sie wirklich Ihren Account löschen?',
             icon: <ExclamationCircleFilled/>,
             content: 'Dieser Schritt kann nicht rückgängig gemacht werden.',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
+            okText: 'Ja',
+            okButtonProps: {danger: true},
+            cancelButtonProps: {autoFocus: false},
+            cancelText: 'Abbrechen',
             onOk() {
                 handleDeleteUser()
             },
@@ -74,7 +76,9 @@ const User = ({users}) => {
                 </Button>
 
                 <Button type="primary" size="large" style={{marginLeft: '20px'}} onClick={showModal} danger>
-                    Account löschen
+                    {loading ? (
+                            <LoadingIcon/>
+                        ) : ('Account löschen')}
                 </Button>
 
             </Card>

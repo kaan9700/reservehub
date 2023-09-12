@@ -63,7 +63,7 @@ export const AuthProvider = ({children}) => {
 
         if (response.status === 200) {
             const refreshToken = authTokens?.refresh
-            const newToken = {'refresh': refreshToken, 'access': data.acces}
+            const newToken = {'refresh': refreshToken, 'access': data.access}
             setAuthTokens(newToken)
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(newToken))
@@ -79,11 +79,14 @@ export const AuthProvider = ({children}) => {
 
     const deleteAccount = async () => {
         try {
-            await makeRequest('POST', DELETE_ACCOUNT, {}, authTokens.access);
+            const del_response = await makeRequest('POST', DELETE_ACCOUNT, {}, authTokens.access);
+            console.log(del_response)
+            return del_response
             // logoutUser(); // Benutzer ausloggen und Token entfernen, nachdem das Konto gelöscht wurde
         } catch (e) {
             console.error("Fehler beim Löschen des Kontos:", e.message);
         }
+
     }
 
 

@@ -18,6 +18,9 @@ import ServiceInfo from "./views/ServiceInfo.jsx";
 import BuyView from "./views/BuyView.jsx";
 import PasswordReset from "./views/PasswordReset.jsx";
 import SetNewPassword from "./views/SetNewPassword.jsx";
+import DeleteAccountView from "./views/DeleteAccount.jsx";
+
+
 function App() {
     const {user} = useContext(AuthContext)
 
@@ -36,7 +39,7 @@ function App() {
                 <Route path="/buy/:id" element={<BuyView/>}/>
                 <Route path="/password-reset" element={<PasswordReset/>}/>
                 <Route
-                    path="/set_new_password/:uid/:token"
+                    path="/set-new-password/:uid/:token"
                     element={<SetNewPassword/>}
                 />
                 <Route path='/user' element={<PrivateRoutes/>}>
@@ -47,6 +50,11 @@ function App() {
                                 <User/>
                     } path='/user'/>
                 </Route>
+
+                <Route path='/delete-account/:uid/:token' element={<PrivateRoutes/>}>
+                    <Route element={<DeleteAccountView />} path='/delete-account/:uid/:token'/>
+                </Route>
+
             </Routes>
             <AppFooter/>
         </>

@@ -16,7 +16,6 @@ async function makeRequest(method, endpoint, data={}, token=false) {
     });
 
     const jsonData = await response.json();
-
     if (!response.ok) {
         throw new Error(jsonData.message);
     }
