@@ -303,3 +303,43 @@ class DeleteAccountConfirmView(APIView):
         # Füge einen Standardfall hinzu
         return Response({"message": "Ungültiger Token oder Benutzer existiert nicht."},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+from paypalrestsdk import Api, WebhookEvent
+# Again, make sure to keep your secret key safe!
+import stripe
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+stripe.api_key = "pk_test_51Npf9cH8ERUGOPnDJ0EBYRWpj0iVjzAvR8aswLVIBNnB4Qw39croBqRKLzma14Y2JeWU4PYOd7rxbtaDjSpUb9qT00FTk7mgvC"
+
+# This is your Stripe CLI webhook secret for testing your endpoint locally.
+endpoint_secret = 'whsec_03c0503ba2d6e748f2b87b76e9f0eb0d289948eae4c9d3a933f6803a7a3f34e2'
+@csrf_exempt
+def webhook(request):
+    if request.method == 'POST':
+        event = None
+        payload = request.body
+        sig_header = request.headers.get('STRIPE_SIGNATURE')
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError as e:
+            # Invalid payload
+            return JsonResponse({'error': 'Invalid payload'}, status=400)
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            return JsonResponse({'error': 'Invalid signature'}, status=400)
+
+        # Handle the event
+        if event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']
+        # ... handle other event types
+        else:
+            print('Unhandled event type {}'.format(event['type']))
+
+        return JsonResponse({'success': True})
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

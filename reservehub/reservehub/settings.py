@@ -146,6 +146,9 @@ SIMPLE_JWT = {
     'TOKEN_OBTAIN_SERIALIZER': "reservehub_app.utils.MyTokenObtainPairSerializer"
 }
 
+PAYPAL_CLIENT_ID = 'AU7P9wDlyMWFlhLYtSVg5NrB0JUU_KmXogOqQh5dRB6YAm2OAHacRo1wxsO9B0mV1JGLfxdFRs3B4veS'
+PAYPAL_SECRET = 'ENXsoRtRkfSkv2xLEf016bLAEHo9ht7z2dK2_CxLswhVZhKSsxFzWiyiohwBFDlU9v-DM2__g9QLqfwB'
+PAYPAL_MODE = 'sandbox'  # Für Testzwecke. Ändern Sie dies in "live", wenn Sie live gehen.
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

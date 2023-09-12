@@ -9,7 +9,9 @@ html {
     color: black;
 }
 
-
+p{
+    color: black;
+}
 
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -324,4 +326,8 @@ button:focus-visible {
 
 #set-new-password label{
     float: left;
+}
+
+.paymentForm{
+    width: 300px;
 }
