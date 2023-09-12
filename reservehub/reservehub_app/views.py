@@ -282,7 +282,7 @@ class DeleteAccountView(APIView):
 
 
 class DeleteAccountConfirmView(APIView):
-    permission_classes = [AllowAny]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
+    permission_classes = [IsAuthenticated]  # Stellen Sie sicher, dass der Benutzer authentifiziert ist
 
     def post(self, request, uidb64=None, token=None):
         UserModel = AppUser
