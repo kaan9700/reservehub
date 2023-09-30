@@ -18,6 +18,8 @@ urlpatterns = [
     path('delete-account/', views.DeleteAccountView.as_view(), name='delete_account'),
     path('delete-account-confirm/<uidb64>/<token>/', views.DeleteAccountConfirmView.as_view(),
          name='delete_account_confirm'),
-    path('webhook/', views.webhook, name='webhook'),
+    path('webhooks-paypal/', views.ProcessWebHookView.as_view(), name='webhook'),
+    path('subscription-plans/', views.SubscriptionPlanListView.as_view(), name='subscription-plan-list'),
+    path('subscription-services/', views.SubscriptionServicesListView.as_view(), name='subscription-services-list'),
 
 ]

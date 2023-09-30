@@ -24,7 +24,6 @@ import DeleteAccountView from "./views/DeleteAccount.jsx";
 function App() {
     const {user} = useContext(AuthContext)
 
-
     return (
         <>
             <NavBar/>
@@ -45,8 +44,8 @@ function App() {
                 <Route path='/user' element={<PrivateRoutes/>}>
 
                     <Route element={
-                        user && user.role === 'admin' ? <Superadmin/> :
-                            user && user.role === 'superadmin' ? <Admin/> :
+                        user && user.role === 'admin' ? <Admin/> :
+                            user && user.role === 'superadmin' ? <Superadmin/> :
                                 <User/>
                     } path='/user'/>
                 </Route>

@@ -1,40 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {Typography, Layout, Collapse, Divider} from 'antd';
 import PackageCard from '../components/PackageCard.jsx'
 import HeaderText from "../components/HeaderText";
 import {Link} from 'react-router-dom';
+import { makeRequest } from '../api/api';
+import {GET_PLANS} from "../api/endpoints.js";  // Importieren Sie Ihre API-Funktion
 
 const {Panel} = Collapse;
 
-
 const ServiceView = () => {
-    const packages = [
-        {
-            'id': 63456345345,
-            'title': 'Basis',
-            'price_monthly': 25,
-            'price_yearly': 250,
-            'services': [
-                {'name': 'Reservierungsverwaltung', 'included': true},
-                {'name': 'Geschäftsstatistik', 'included': false},
-                {'name': 'Geschäftspromotion', 'included': false},
-                {'name': '24/7 Support', 'included': false},
+    const [packages, setPackages] = useState([]);  // Zustand für Packages initialisieren
 
-            ]
-        },
-        {
-            'id': 123123123,
-            'title': 'Premium',
-            'price_monthly': 30,
-            'price_yearly': 320,
-            'services': [
-                {'name': 'Reservierungsverwaltung', 'included': true},
-                {'name': 'Geschäftsstatistik', 'included': true},
-                {'name': 'Geschäftspromotion', 'included': true},
-                {'name': '24/7 Support', 'included': false},
-            ]
-        },
-    ];
+    useEffect(() => {
+        // Definieren Sie eine asynchrone Funktion innerhalb des useEffect
+        const fetchData = async () => {
+            try {
+                const data = await makeRequest('GET', GET_PLANS);
+                setPackages(data);  // Zustand aktualisieren
+            } catch (error) {
+                console.error('Fehler beim Abrufen der Paketdaten:', error);
+            }
+        };
+
+        fetchData();  // Funktion aufrufen
+    }, []);  // [] sorgt dafür, dass der Effekt nur beim ersten Rendering ausgeführt wird
+
 
 
     return (

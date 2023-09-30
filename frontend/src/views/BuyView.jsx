@@ -1,9 +1,8 @@
 import {Card, Descriptions, Typography} from 'antd';
 import {useParams} from 'react-router-dom';
 import {useState, useEffect} from 'react';
-import {Elements} from '@stripe/react-stripe-js';
-import {loadStripe} from '@stripe/stripe-js';
-import PaymentForm from '../components/PaymentForm.jsx';
+import Notifications from "../components/Notifications.jsx";
+
 
 const {Title} = Typography;
 
@@ -64,30 +63,78 @@ const BuyView = () => {
     const service_package = packages.find(pkg => pkg.id === Number(id));
 
 
-    const PUBLIC_KEY = 'pk_test_51Npf9cH8ERUGOPnDJ0EBYRWpj0iVjzAvR8aswLVIBNnB4Qw39croBqRKLzma14Y2JeWU4PYOd7rxbtaDjSpUb9qT00FTk7mgvC'
-    const stripeTestPromise = loadStripe(PUBLIC_KEY);
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = "https://www.paypal.com/sdk/js?client-id=AVmmlXnLZTZbx-UU-qcEon100jYuvqJ8_LZb33g8Zj8rEtEHsuxbEzd3rPsT9eF40Jhg4X5RAlA1TqvL&vault=true&intent=subscription";
+        script.onload = () => {
+            if (document.getElementById('paypal-button-container-P-2FL68816J8692583GMUK5T4A')) {
+                window.paypal.Buttons({
+                    style: {
+                        shape: 'rect',
+                        color: 'black',
+                        layout: 'vertical',
+                        label: 'subscribe'
+                    },
+                    createSubscription: function (data, actions) {
+                        return actions.subscription.create({
+                            'plan_id': 'P-2FL68816J8692583GMUK5T4A'
+                        });
+                    },
+
+                    onApprove: function (data, actions) {
+                        return actions.subscription.get().then(details => {
+                            Notifications('success', {
+                            'message': "Zahlungsvorgang erfolgreich!",
+                            'description': "Bitte check deine Mails nach einer Buchungsbestätigung"
+                        });
+                        });
+                    },
+
+                    onCancel: function (data) {
+                        Notifications('warning', {
+                            'message': "Zahlungsvorgang wurde abgebrochen",
+                            'description': "Bitte erneut versuchen"
+                        });
+                    },
+                    onError: function (err) {
+                        Notifications('error', {
+                            'message': "Ein Fehler ist aufgetreten",
+                            'description': "Bitte check deine Mails nach einer Buchungsbestätigung oder versuche es erneut."
+                        });
+                    }
+                }).render('#paypal-button-container-P-2FL68816J8692583GMUK5T4A');
+            }
+        }; // 3F8DR5FHWC74
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
+        }
+    }, []);
 
 
     return (
         <div style={{maxWidth: 600, margin: '0 auto'}}>
             <Title level={2}>Ihre Bestellung</Title>
             <Card>
-                <Title level={4}>{service_package.title}</Title>
-                <Descriptions column={1}>
-                    <Descriptions.Item
-                        label="Monatlicher Preis">{service_package.price_monthly} Euro</Descriptions.Item>
-                    <Descriptions.Item label="Jährlicher Preis">{service_package.price_yearly} Euro</Descriptions.Item>
-                    <Descriptions.Item label="Abonnementlänge">Ein Jahr</Descriptions.Item>
-                </Descriptions>
+                <Card>
+                    <Title level={4}>{service_package.title}</Title>
+                    <Descriptions column={1}>
+                        <Descriptions.Item
+                            label="Monatlicher Preis">{service_package.price_monthly} Euro</Descriptions.Item>
+                        <Descriptions.Item
+                            label="Jährlicher Preis">{service_package.price_yearly} Euro</Descriptions.Item>
+                        <Descriptions.Item label="Abonnementlänge">Ein Jahr</Descriptions.Item>
+                    </Descriptions>
+                </Card>
             </Card>
             <Card style={{marginTop: 20}}>
-                <Elements stripe={stripeTestPromise}>
-                    <PaymentForm />
-                </Elements>
+                <div id="paypal-button-container-P-2FL68816J8692583GMUK5T4A"></div>
             </Card>
-
         </div>
     );
 };
 
 export default BuyView;
+
+
+

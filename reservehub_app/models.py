@@ -52,8 +52,10 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)  # Neu hinzugefügt
-    is_superuser = models.BooleanField(default=False)  # Neu hinzugefügt
+    is_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    subscription_id = models.CharField(max_length=255, blank=True, null=True)
+    subscription_end = models.DateField(blank=True, null=True)
 
     objects = AppUserManager()
 
@@ -81,3 +83,23 @@ class DeleteAccountToken(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+
+class SubscriptionPlan(models.Model):
+    plan_id = models.CharField(max_length=255, unique=True)  # Eindeutige ID für den Plan
+    price = models.FloatField()  # Preis des Plans
+    plan_name = models.CharField(max_length=255)  # Name des Plans
+    description = models.TextField()  # Beschreibung des Plans
+    included_services = models.TextField()  # Beinhaltende Dienste als Textfeld
+
+    def __str__(self):
+        return self.plan_name
+
+
+class SubscriptionServices(models.Model):
+    service = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.service

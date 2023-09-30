@@ -22,11 +22,11 @@ const NavBar = () => {
 
     const {user, logoutUser} = useContext(AuthContext)
     const current = location.pathname.slice(1);
-    
+
     const onClick = (e) => {
         navigate(`/${e.key}`);
     };
-    
+
 
     const handleLogout = async () => {
         if (user) {
@@ -125,6 +125,7 @@ const NavBar = () => {
                 style={{
                     width: "50%",
                     alignItems: "center",
+
                 }}
             />
             <Menu

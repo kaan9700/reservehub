@@ -1,9 +1,9 @@
-import SideBar from "../../components/SideBar.jsx";
-import Dashboard from "../../components/Dashboard.jsx"
+import SideBar from "../../components/User/SideBar.jsx";
+import Dashboard from "../../components/User/Dashboard.jsx"
 import {Layout} from 'antd';
 import { useState, useEffect} from 'react'
-import ProfileSettings from '../../components/ProfileSettings.jsx'
-import Reservations from '../../components/Reservations.jsx'
+import ProfileSettings from '../../components/User/ProfileSettings.jsx'
+import Reservations from '../../components/User/Reservations.jsx'
 import Store from '../../components/Store.jsx'
 import {
     DashboardOutlined,

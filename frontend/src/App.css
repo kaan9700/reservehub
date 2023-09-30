@@ -9,7 +9,7 @@ html {
     color: black;
 }
 
-p{
+p {
     color: black;
 }
 
@@ -102,7 +102,7 @@ button:focus-visible {
     text-align: center;
     display: flex;
     flex-direction: column;
-  background: #eff2f5;
+    background: #eff2f5;
 
 }
 
@@ -306,6 +306,8 @@ button:focus-visible {
     .packageCard-info span {
         font-size: 14px
     }
+
+
 }
 
 .standardUser div {
@@ -324,10 +326,38 @@ button:focus-visible {
 }
 
 
-#set-new-password label{
+#set-new-password label {
     float: left;
 }
 
-.paymentForm{
+.paymentForm {
     width: 300px;
+}
+
+.navbar {
+    background: white;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card-wrapper {
+    flex: 1;
+    min-width: calc(50% - 10px); /* Hier können Sie die Mindestbreite anpassen */
+}
+
+@media (max-width: 1250px) {
+    .card-wrapper {
+        min-width: 100%;
+    }
+
+    .card-container {
+        flex-direction: column;
+    }
 }

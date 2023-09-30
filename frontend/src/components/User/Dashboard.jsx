@@ -1,4 +1,4 @@
-import StatisticCard from './StatisticCard.jsx'
+import StatisticCard from '../StatisticCard.jsx'
 import UserInfo from './UserInfo.jsx'
 import {
     Chart as ChartJS,

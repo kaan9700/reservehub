@@ -1,19 +1,26 @@
-
-
-async function makeRequest(method, endpoint, data={}, token=false) {
+async function makeRequest(method, endpoint, data = {}, token = false) {
     const headers = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     };
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(endpoint, {
-        method: method, // Verwenden Sie die Methode aus den Parametern
+    const fetchOptions = {
+        method: method,
         headers: headers,
-        body: JSON.stringify(data)
-    });
+    };
+
+    if (method !== 'GET') {
+        fetchOptions.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(endpoint, fetchOptions);
+
+    if (response.status === 204) {
+        return null; // Kein Inhalt
+    }
 
     const jsonData = await response.json();
     if (!response.ok) {
@@ -24,4 +31,4 @@ async function makeRequest(method, endpoint, data={}, token=false) {
 }
 
 
-export {makeRequest}
+export { makeRequest };

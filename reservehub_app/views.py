@@ -1,11 +1,13 @@
+import json
+
+from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
-from rest_framework_jwt.settings import api_settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import AppUser
+from .models import AppUser, SubscriptionPlan, SubscriptionServices
 from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -16,9 +18,13 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils import timezone
 from rest_framework import status
-from django.shortcuts import render
-from .utils import MyTokenObtainPairSerializer
+from django.views.decorators.csrf import csrf_exempt
+from .utils import MyTokenObtainPairSerializer, SubscriptionPlanSerializer, SubscriptionServicesSerializer
 from .models import PasswordToken, DeleteAccountToken
+from django.views.generic import View
+from paypalrestsdk import notifications
+from django.conf import settings
+
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -36,6 +42,7 @@ def getRoutes(request):
     ]
     return Response(routes)
 
+
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
 
@@ -48,10 +55,8 @@ class RegisterView(APIView):
         if not email:
             return Response({'error': 'Bitte geben Sie eine E-Mail an'}, status=400)
 
-
         if not password:
             return Response({'error': 'Bitte geben Sie ein Passwort an'}, status=400)
-
 
         if not phone:
             return Response({'error': 'Bitte geben Sie eine Telefonnummer an'}, status=400)
@@ -61,7 +66,6 @@ class RegisterView(APIView):
 
         if password != password_confirmation:
             return Response({'error': 'Passwörter stimmen nicht überein'}, status=400)
-
 
         if AppUser.objects.filter(email=email).exists():
             return Response({"message": 'Ein Konto mit diesem Benutzernamen existiert bereits'}, status=400)
@@ -77,8 +81,6 @@ class RegisterView(APIView):
             user.groups.add(standard_users_group)
         except IntegrityError as e:
             return Response({'error': 'An error occurred while creating the user.'}, status=500)
-
-
 
         return Response({'message': 'success'}, status=200)
 
@@ -131,7 +133,6 @@ class LoginView(APIView):
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.email_confirmed:
-
             return Response({'message': 'E-Mail Adresse wurde nicht bestätigt'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -139,12 +140,14 @@ class LoginView(APIView):
             return Response({'message': 'Das Passwort ist nicht korrekt'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
+        user.last_login = timezone.now()
+        user.save()
+
         serializer = MyTokenObtainPairSerializer(data=request.data)
         if serializer.is_valid():
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         else:
             return Response({'message': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 class PasswordResetRequestView(APIView):
@@ -169,8 +172,8 @@ class PasswordResetRequestView(APIView):
                 token_model = PasswordToken(user=user, token=default_token_generator.make_token(user))
                 token_model.save()
 
-                subject_template_name='reservehub_app/reset_password_email_subject.txt'
-                email_template_name='reservehub_app/reset_password_email.html'
+                subject_template_name = 'reservehub_app/reset_password_email_subject.txt'
+                email_template_name = 'reservehub_app/reset_password_email.html'
                 subject = render_to_string(subject_template_name, c)
 
                 # remove new lines from the subject
@@ -213,8 +216,9 @@ class PasswordResetConfirmView(APIView):
             send_mail(subject, email, 'k.erbay9700@gmail.com', [user.email], fail_silently=False)
             return Response({'message': 'Das Passwort wurde erfolgreich geändert'}, status=200)
         else:
-            return Response({'message': 'Der Link zum Zurücksetzen Ihres Passworts ist abgelaufen. Bitte fordern Sie einen neuen an'},
-                            status=400)
+            return Response({
+                'message': 'Der Link zum Zurücksetzen Ihres Passworts ist abgelaufen. Bitte fordern Sie einen neuen an'},
+                status=400)
 
 
 class TokenRefreshView(APIView):
@@ -305,41 +309,162 @@ class DeleteAccountConfirmView(APIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-from paypalrestsdk import Api, WebhookEvent
-# Again, make sure to keep your secret key safe!
-import stripe
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-stripe.api_key = "pk_test_51Npf9cH8ERUGOPnDJ0EBYRWpj0iVjzAvR8aswLVIBNnB4Qw39croBqRKLzma14Y2JeWU4PYOd7rxbtaDjSpUb9qT00FTk7mgvC"
+class SubscriptionPlanListView(APIView):
+    def get(self, request):
+        plans = SubscriptionPlan.objects.all()
+        serializer = SubscriptionPlanSerializer(plans, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-# This is your Stripe CLI webhook secret for testing your endpoint locally.
-endpoint_secret = 'whsec_03c0503ba2d6e748f2b87b76e9f0eb0d289948eae4c9d3a933f6803a7a3f34e2'
-@csrf_exempt
-def webhook(request):
-    if request.method == 'POST':
-        event = None
-        payload = request.body
-        sig_header = request.headers.get('STRIPE_SIGNATURE')
+    def post(self, request):
+        method_type = request.data.get('method')
 
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, endpoint_secret
-            )
-        except ValueError as e:
-            # Invalid payload
-            return JsonResponse({'error': 'Invalid payload'}, status=400)
-        except stripe.error.SignatureVerificationError as e:
-            # Invalid signature
-            return JsonResponse({'error': 'Invalid signature'}, status=400)
+        if method_type == 'add':
+            data = {key: value for key, value in request.data.items() if key != 'method'}
 
-        # Handle the event
-        if event['type'] == 'payment_intent.succeeded':
-            payment_intent = event['data']['object']
-        # ... handle other event types
+            # Umwandeln der Liste in einen String, falls notwendig
+            if 'included_services' in data:
+                try:
+                    data['included_services'] = ','.join(data['included_services'])
+                except TypeError:
+                    return Response({"error": "included_services should be a list"}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = SubscriptionPlanSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+        elif method_type == 'change':
+            old_plan_id = request.data.get('old_plan_id')
+
+            new_plan_data = request.data.get(
+                'new_data')  # Nehmen wir an, dass die neuen Daten unter dem Schlüssel 'new_data' geschickt werden.
+            new_plan_data.pop('old_plan_id')
+
+            if 'included_services' in new_plan_data:
+                try:
+                    new_plan_data['included_services'] = ','.join(new_plan_data['included_services'])
+                except TypeError:
+                    return Response({"error": "included_services should be a list"}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+
+                existing_plan = SubscriptionPlan.objects.get(plan_id=old_plan_id)
+
+            except SubscriptionPlan.DoesNotExist:
+
+                return Response({'error': 'Plan does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Aktualisieren des Plans mit den neuen Daten.
+
+            serializer = SubscriptionPlanSerializer(existing_plan, data=new_plan_data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif method_type == 'delete':
+            plan_id = request.data.get('plan_id')
+            try:
+                plan = SubscriptionPlan.objects.get(plan_id=plan_id)
+            except SubscriptionPlan.DoesNotExist:
+                return Response({'error': 'Plan does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            plan.delete()
+            return Response({'status': 'Plan deleted'}, status=status.HTTP_204_NO_CONTENT)
+
         else:
-            print('Unhandled event type {}'.format(event['type']))
+            return Response({'error': 'Invalid method type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse({'success': True})
 
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+class SubscriptionServicesListView(APIView):
+    def get(self, request):
+        services = SubscriptionServices.objects.all()
+        serializer = SubscriptionServicesSerializer(services, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        method_type = request.data.get('method')
+
+        if method_type == 'add':
+            data = {key: value for key, value in request.data.items() if key != 'method'}
+            serializer = SubscriptionServicesSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif method_type == 'change':
+            old_service_data = request.data.get('old_data')
+            old_service_id = old_service_data.get('id')
+            new_service_data = request.data.get('new_data')  # Nehmen wir an, dass die neuen Daten unter dem Schlüssel 'new_data' geschickt werden.
+            new_service_data.pop('old_service_id', None)
+
+            try:
+                existing_service = SubscriptionServices.objects.get(id=old_service_id)
+            except SubscriptionServices.DoesNotExist:
+                return Response({'error': 'Service does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = SubscriptionServicesSerializer(existing_service, data=new_service_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif method_type == 'delete':
+            service_id = request.data.get('service_id')
+            try:
+                service = SubscriptionServices.objects.get(id=service_id)
+            except SubscriptionServices.DoesNotExist:
+                return Response({'error': 'Service does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            service.delete()
+            return Response({'status': 'Service deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+        else:
+            return Response({'error': 'Invalid method type'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ProcessWebHookView(View):
+    def post(self, request):
+        if "HTTP_PAYPAL_TRANSMISSION_ID" not in request.META:
+            return HttpResponse(status=400)
+
+        auth_algo = request.META['HTTP_PAYPAL_AUTH_ALGO']
+        cert_url = request.META['HTTP_PAYPAL_CERT_URL']
+        transmission_id = request.META['HTTP_PAYPAL_TRANSMISSION_ID']
+        transmission_sig = request.META['HTTP_PAYPAL_TRANSMISSION_SIG']
+        transmission_time = request.META['HTTP_PAYPAL_TRANSMISSION_TIME']
+        webhook_id = settings.PAYPAL_WEBHOOK_ID
+        event_body = request.body.decode(request.encoding or "utf-8")
+
+        valid = notifications.WebhookEvent.verify(
+            transmission_id=transmission_id,
+            timestamp=transmission_time,
+            webhook_id=webhook_id,
+            event_body=event_body,
+            cert_url=cert_url,
+            actual_sig=transmission_sig,
+            auth_algo=auth_algo,
+        )
+
+        if not valid:
+            return HttpResponse(status=400)
+
+        webhook_event = json.loads(event_body)
+
+        event_type = webhook_event["event_type"]
+        if event_type == 'PAYMENT.SALE.COMPLETED':
+            subscription_id = webhook_event["resource"]["billing_agreement_id"]
+
+        print(event_type)
+
+        return HttpResponse()

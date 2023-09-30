@@ -1,7 +1,7 @@
 // UserPage.jsx
 
 import React, {useContext, useState} from 'react';
-import {Card, Button, Typography, Divider, Descriptions, Modal} from 'antd';
+import {Card, Button, Typography, Divider, Descriptions, Modal, Input} from 'antd';
 import {json, useNavigate} from 'react-router-dom';
 import {ExclamationCircleFilled} from '@ant-design/icons';
 import AuthContext from "../../auth/AuthProvider.jsx";
@@ -17,6 +17,9 @@ const User = ({users}) => {
     const navigate = useNavigate();
     const {user, deleteAccount, logoutUser} = useContext(AuthContext)
     const [loading, setLoading] = useState(false);
+    const [activationCode, setActivationCode] = useState('');  // Neuer useState Hook für den Aktivierungscode
+    const [codeError, setCodeError] = useState(null);  // Neuer useState Hook für Fehlermeldungen
+
     const handleDeleteUser = async () => {
         setLoading(true);
         if (user) {
@@ -29,6 +32,14 @@ const User = ({users}) => {
         setLoading(false);
     };
 
+    const handleActivatePro = () => {
+        if (activationCode === '123456') {  // Dummy-Überprüfung
+            console.log('Pro-Einstellungen aktiviert!');
+            setCodeError(null);
+        } else {
+            setCodeError('Ungültiger Aktivierungscode.');
+        }
+    };
 
     const showModal = () => {
         confirm({
@@ -39,6 +50,7 @@ const User = ({users}) => {
             okButtonProps: {danger: true},
             cancelButtonProps: {autoFocus: false},
             cancelText: 'Abbrechen',
+            centered: true,
             onOk() {
                 handleDeleteUser()
             },
@@ -70,15 +82,34 @@ const User = ({users}) => {
                 </Descriptions>
 
                 <Divider/>
+                <div style={{marginBottom: '20px'}}>
+                    <Title level={4}>Aktivieren Sie Ihre Pro-Einstellungen</Title>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                    }}>
+                        <Input
+                            value={activationCode}
+                            onChange={(e) => setActivationCode(e.target.value)}
+                            placeholder="Aktivierungscode eingeben"
+                            style={{marginRight: '10px'}}
+                        />
+                        <Button type="primary" onClick={handleActivatePro}>Aktivieren</Button>
+                    </div>
+                    {codeError && <Text type="danger" style={{marginTop: '10px'}}>{codeError}</Text>}
+                    <div style={{marginBottom: '40px'}}></div>
+                    <Button type="primary" size="large" onClick={() => navigate('/services')}>
+                        Entdecken Sie unsere Dienste
+                    </Button>
+                </div>
 
-                <Button type="primary" size="large" onClick={() => navigate('/services')}>
-                    Entdecken Sie unsere Dienste
-                </Button>
-
+                <Divider/>
                 <Button type="primary" size="large" style={{marginLeft: '20px'}} onClick={showModal} danger>
                     {loading ? (
-                            <LoadingIcon/>
-                        ) : ('Account löschen')}
+                        <LoadingIcon/>
+                    ) : ('Account löschen')}
                 </Button>
 
             </Card>
