@@ -12,7 +12,8 @@ import {
     InputNumber,
     Select,
     Modal,
-    Divider
+    Divider,
+    List,
 } from 'antd';
 import {DeleteOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined,} from '@ant-design/icons';
 import {makeRequest} from "../../api/api.js";
@@ -28,12 +29,12 @@ const PlansSettings = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [reload, setReload] = useState(false);
     const formRef = useRef(null);
-    const [services, setServices] = useState([]); // List der Dienste
+    const [services, setServices] = useState([]); //
     const [editingService, setEditingService] = useState(null);
     const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
     const [formValuesService, setFormValuesService] = useState({});
-    const serviceFormRef = useRef(null); // Referenz für das Formular im Modal
-    const [reloadService, setReloadService] = useState(false); // Trigger für das erneute Laden der Dienstliste
+    const serviceFormRef = useRef(null);
+    const [reloadService, setReloadService] = useState(false);
     const [availableServices, setAvailableServices] = useState([]);
 
     useEffect(() => {
@@ -261,14 +262,14 @@ const PlansSettings = () => {
     return (
         <>
             <Title level={3} className={'dashboard-title'}
-                   style={{textAlign: 'left', padding: '40px 0 0 20px'}}>Pakete</Title>
+                   style={{textAlign: 'left', padding: '40px 0 0 40px'}}>Pläne</Title>
 
             <div className="card-container">
                 {plans.map((plan, index) => (
                     <div className="card-wrapper" key={index}>
                         <Card
                             style={{
-                                width: '500px',
+                                width: '400px',
                                 height: editingPlan?.plan_id === plan.plan_id ? 'auto' : '300px',
                                 padding: '20px',
                                 textAlign: 'left'
@@ -355,7 +356,7 @@ const PlansSettings = () => {
                         </Card>
                     </div>
                 ))}
-                <Button type="primary" icon={<PlusOutlined/>} onClick={showModal} style={{margin: '20px'}}>
+                <Button type="primary" icon={<PlusOutlined/>} onClick={showModal} style={{margin: '20px 0 20px 40px'}}>
                     Neuer Plan
                 </Button>
                 <Modal title="Neuer Plan erstellen" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
@@ -387,62 +388,55 @@ const PlansSettings = () => {
                 <Divider/>
                 <div>
                     <Title level={3} className={'dashboard-title'}
-                           style={{textAlign: 'left', padding: '0 0 0 20px'}}>Dienste</Title>
-                    <div className="card-container">
-                        {services.map((service, index) => (
-                            <div className="card-wrapper" key={index}>
-                                <Card
-                                    style={{
-                                        width: '300px',
-                                        height: editingService?.id === service.id ? 'auto' : '150px',
-                                        padding: '20px',
-                                        textAlign: 'left'
-                                    }}
-                                    title={service.service}
-                                    bordered={true}
-                                    extra={
+                           style={{textAlign: 'left', padding: '0 0 0 40px'}}>Dienste</Title>
+                    <List
+                        bordered
+                        dataSource={services}
+                        style={{marginLeft: '40px', background: 'white'}}
+                        renderItem={service => (
+                            <List.Item
+                                actions={[
+                                    editingService?.id === service.id ? (
                                         <>
-                                            {editingService?.id === service.id ? (
-                                                <>
-                                                    <Button type="text" icon={<SaveOutlined/>}
-                                                            onClick={() => handleSaveService(service.id)}/>
-                                                    <Button type="text" icon={<CloseOutlined/>}
-                                                            onClick={handleCancelEditService}/>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Popconfirm
-                                                        title="Sind Sie sicher, dass Sie diesen Dienst löschen möchten?"
-                                                        onConfirm={() => handleDeleteService(service.id)} okText="Ja"
-                                                        cancelText="Nein">
-                                                        <Button type="text" icon={<DeleteOutlined/>}
-                                                                style={{color: 'red'}}/>
-                                                    </Popconfirm>
-                                                    <Button type="text" icon={<EditOutlined/>}
-                                                            onClick={() => handleEditService(service)}/>
-                                                </>
-                                            )}
+                                            <Button type="text" icon={<SaveOutlined/>}
+                                                    onClick={() => handleSaveService(service.id)}/>
+                                            <Button type="text" icon={<CloseOutlined/>}
+                                                    onClick={handleCancelEditService}/>
                                         </>
-                                    }
-                                >
-                                    {editingService?.id === service.id ? (
-                                        <Form
-                                            layout="vertical"
-                                            onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}
-                                            initialValues={service}
-                                        >
-                                            <Form.Item label="Dienst Name" name="service">
-                                                <Input/>
-                                            </Form.Item>
-                                        </Form>
                                     ) : (
-                                        <></>
-                                    )}
-                                </Card>
-                            </div>
-                        ))}
-                        <Button type="primary" icon={<PlusOutlined/>} onClick={showServiceModal}
-                                style={{margin: '20px'}}>
+                                        <>
+                                            <Popconfirm
+                                                title="Sind Sie sicher, dass Sie diesen Dienst löschen möchten?"
+                                                onConfirm={() => handleDeleteService(service.id)} okText="Ja"
+                                                cancelText="Nein"
+                                            >
+                                                <Button type="text" icon={<DeleteOutlined/>} style={{color: 'red'}}/>
+                                            </Popconfirm>
+                                            <Button type="text" icon={<EditOutlined/>}
+                                                    onClick={() => handleEditService(service)}/>
+                                        </>
+                                    )
+                                ]}
+                            >
+                                {editingService?.id === service.id ? (
+                                    <Form
+                                        layout="vertical"
+                                        onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}
+                                        initialValues={service}
+
+                                    >
+                                        <Form.Item name="service" style={{margin: '0'}}>
+                                            <Input/>
+                                        </Form.Item>
+                                    </Form>
+                                ) : (
+                                    service.service
+                                )}
+                            </List.Item>
+                        )}
+                    />
+                     <Button type="primary" icon={<PlusOutlined/>} onClick={showServiceModal}
+                                style={{margin: '20px 0 20px 40px', float: 'left'}}>
                             Neuer Dienst
                         </Button>
                         <Modal title="Neuer Dienst erstellen" open={isServiceModalVisible} onOk={handleServiceOk}
@@ -454,7 +448,6 @@ const PlansSettings = () => {
                                 </Form.Item>
                             </Form>
                         </Modal>
-                    </div>
                 </div>
             </div>
         </>

@@ -175,10 +175,6 @@ button:focus-visible {
     margin: 0;
 }
 
-.ant-card-body {
-    height: 100%;
-}
-
 
 .statisticCard-title-wrapper {
     display: flex;
@@ -245,6 +241,7 @@ button:focus-visible {
     flex-direction: column;
 }
 
+
 .package-title {
     margin-top: 0;
 }
@@ -252,50 +249,76 @@ button:focus-visible {
 .service-view {
     gap: 20px;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
-    width: 95%;
     margin: 70px auto;
-    padding-bottom: 70px;
+    height: auto;
+    padding: 0 20px 70px 20px;
 
 }
 
-.packageCard {
-    width: 100%;
-    transition: transform 0.3s ease-in-out;
-}
-
-.package-icon {
-    font-size: 50px;
-    color: gold;
-}
-
-.packageCard:hover {
-    transform: scale(1.1);
+@media (min-width: 767px) {
+    .packageCard {
+        flex: 1;
+        display: block;
+        overflow: auto;
+        min-width: 300px;
+        max-width: 300px;
+    }
 }
 
 .packageCard-info span {
-    font-size: 20px
+    font-size: 16px;
+
 }
 
+.packageCard-info div{
+    width: 100%;
+}
 
 .package-price {
     font-size: 20px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 767px) {
     .header-text {
         font-size: 20px;
+    }
+
+    .services-wrapper {
+
+        margin-bottom: 100px;
     }
 
     .package-price {
         font-size: 16px;
     }
 
+    .packageCard {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 300px;
+
+    }
+
+    .get-started-button{
+        margin-bottom: 20px;
+    }
+
+    .services-signature{
+        margin-top: 20px;
+    }
+
     .service-view {
         flex-direction: column;
-        width: 80%;
+        width: 100%;
+        margin-top: 0px
 
+    }
+
+    .service-view div {
+        margin: 0 auto
     }
 
     .packageCard div h3 {
@@ -322,7 +345,6 @@ button:focus-visible {
 
 .services-wrapper {
     flex: 0.9;
-    margin-bottom: 50px
 }
 
 
@@ -344,15 +366,15 @@ button:focus-visible {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 20px;
-    padding: 20px;
 }
 
 .card-wrapper {
     flex: 1;
-    min-width: calc(50% - 10px); /* Hier können Sie die Mindestbreite anpassen */
+    display: flex;
+    margin-left: 40px;
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1000px) {
     .card-wrapper {
         min-width: 100%;
     }
@@ -360,4 +382,9 @@ button:focus-visible {
     .card-container {
         flex-direction: column;
     }
+}
+
+.get-started-button {
+    width: 75%;
+    height: 35px
 }

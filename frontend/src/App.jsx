@@ -35,7 +35,7 @@ function App() {
                 <Route path='/about' element={<About/>}/>
                 <Route path='/services' element={<Services/>}/>
                 <Route path="/service/:id" element={<ServiceInfo/>}/>
-                <Route path="/buy/:id" element={<BuyView/>}/>
+                <Route path="/buy" element={<BuyView/>}/>
                 <Route path="/password-reset" element={<PasswordReset/>}/>
                 <Route
                     path="/set-new-password/:uid/:token"
