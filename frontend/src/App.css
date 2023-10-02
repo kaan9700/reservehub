@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
 }
 
 html {
@@ -122,6 +123,8 @@ button:focus-visible {
 .user-wrapper {
     flex: 1;
     display: flex;
+    flex-direction: row;
+    width: 100%;
     height: 100%;
 }
 
@@ -129,11 +132,13 @@ button:focus-visible {
     background: white;
     width: fit-content;
     float: left;
-
+    flex-grow: 0; /* Erlaubt dem Element nicht, über seine Basisbreite hinaus zu wachsen */
+    flex-shrink: 0; /* Erlaubt dem Element nicht, kleiner als seine Basisbreite zu werden */
 }
 
 .content {
-    width: 100%;
+    max-width: 100%;
+    flex-grow: 1;
 }
 
 .form-wrapper {
@@ -190,7 +195,6 @@ button:focus-visible {
 
 .ant-card-body {
     width: 100%;
-    display: flex;
     align-items: center;
 }
 
@@ -241,6 +245,9 @@ button:focus-visible {
     flex-direction: column;
 }
 
+.ant-layout-sider-trigger {
+    color: white;
+}
 
 .package-title {
     margin-top: 0;
@@ -273,7 +280,7 @@ button:focus-visible {
 
 }
 
-.packageCard-info div{
+.packageCard-info div {
     width: 100%;
 }
 
@@ -282,6 +289,12 @@ button:focus-visible {
 }
 
 @media (max-width: 767px) {
+
+    .Card{
+        min-width: 100%;
+
+    }
+
     .header-text {
         font-size: 20px;
     }
@@ -302,18 +315,18 @@ button:focus-visible {
 
     }
 
-    .get-started-button{
+    .get-started-button {
         margin-bottom: 20px;
     }
 
-    .services-signature{
+    .services-signature {
         margin-top: 20px;
     }
 
     .service-view {
         flex-direction: column;
         width: 100%;
-        margin-top: 0px
+        margin-top: 0;
 
     }
 
@@ -330,7 +343,16 @@ button:focus-visible {
         font-size: 14px
     }
 
+    .dashboard-chart{
+        min-width: 100%;
+    }
 
+    .dashboard-table-wrapper,
+    .dashboard-chart-wrapper,
+    .dashboard-userInfo-wrapper {
+        flex: 1;
+        max-width: 100%;
+    }
 }
 
 .standardUser div {
@@ -374,6 +396,16 @@ button:focus-visible {
     margin-left: 40px;
 }
 
+.Card{
+    width: 250px;
+}
+
+.Card div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 @media (max-width: 1000px) {
     .card-wrapper {
         min-width: 100%;
@@ -388,3 +420,22 @@ button:focus-visible {
     width: 75%;
     height: 35px
 }
+
+.paypal-buttons {
+    width: 100%;
+}
+
+.paypal-buttons div div {
+    width: 100%;
+}
+
+.content {
+    overflow: hidden;
+}
+
+.dashboard-visuals{
+    margin-bottom: 100px;
+}
+
+
+

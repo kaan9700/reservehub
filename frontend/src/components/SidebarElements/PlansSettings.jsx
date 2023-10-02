@@ -269,7 +269,7 @@ const PlansSettings = () => {
                     <div className="card-wrapper" key={index}>
                         <Card
                             style={{
-                                width: '400px',
+                                width: '450px',
                                 height: editingPlan?.plan_id === plan.plan_id ? 'auto' : '300px',
                                 padding: '20px',
                                 textAlign: 'left'

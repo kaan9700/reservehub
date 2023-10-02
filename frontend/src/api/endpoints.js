@@ -13,3 +13,6 @@ export const DELETE_ACCOUNT_CONFIRM = BASE_URL + "delete-account-confirm/"
 export const GET_PLANS = BASE_URL + "subscription-plans/"
 
 export const GET_SERVICES = BASE_URL + "subscription-services/"
+
+export const POST_TRANSACTION = BASE_URL + "received-payments/"
+

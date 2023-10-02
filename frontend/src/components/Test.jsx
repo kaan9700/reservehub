@@ -1,5 +1,5 @@
 import NavBar from "./NavBar.jsx";
-import SideBar from "./User/SideBar.jsx";
+import SideBar from "./SidebarElements/SideBar.jsx";
 
 
 const Test = () => {

@@ -23,7 +23,6 @@ import DeleteAccountView from "./views/DeleteAccount.jsx";
 
 function App() {
     const {user} = useContext(AuthContext)
-
     return (
         <>
             <NavBar/>

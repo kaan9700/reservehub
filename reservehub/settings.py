@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
     '172.20.10.7',
     '127.0.0.1',
     '192.168.178.59',
-    '5c4e-2003-ef-5700-c800-414e-3e65-c893-e858.ngrok-free.app'
+    'bf04-2003-ef-5700-c800-4e0-99ef-f3bd-22af.ngrok-free.app'
 ]
 
 
@@ -151,6 +151,8 @@ PAYPAL_CLIENT_ID = 'AVmmlXnLZTZbx-UU-qcEon100jYuvqJ8_LZb33g8Zj8rEtEHsuxbEzd3rPsT
 PAYPAL_SECRET = 'EO_CC4qSjNvUWxEgYz1wos9oa_T8qN7DWWQYnr6aUaxIvWRNFCypYRjtmehf5Z0sZq0zjMTf1p0fR061'
 PAYPAL_MODE = 'live'  # Für Testzwecke. Ändern Sie dies in "live", wenn Sie live gehen.
 PAYPAL_WEBHOOK_ID = '40K34173K99863249'
+
+
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

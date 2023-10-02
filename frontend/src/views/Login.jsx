@@ -25,6 +25,8 @@ const SignInForm = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
+    const params = new URLSearchParams(location.search);
+    const redirectTo = params.get('redirectTo');
 
     useEffect(() => {
         if (user) {
@@ -35,7 +37,7 @@ const SignInForm = () => {
     const onFinish = async (values) => {
         setLoading(true)
         try {
-            await loginUser(values)
+            await loginUser(values, redirectTo);
         } catch (error) {
             Notifications('error', {'message': 'Fehler', 'description': error.message})
         }

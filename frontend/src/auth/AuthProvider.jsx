@@ -18,7 +18,7 @@ export const AuthProvider = ({children}) => {
 
     const navigate = useNavigate()
 
-    const loginUser = async (values) => {
+    const loginUser = async (values, redirectTo) => {
 
         const response = await fetch(BASE_URL + 'login/', {
             method: 'POST',
@@ -28,11 +28,12 @@ export const AuthProvider = ({children}) => {
             body: JSON.stringify({'email': values.email, 'password': values.password})
         });
         const data = await response.json()
+        console.log("DATA", data.access)
         if (response.status === 200) {
             setAuthTokens(data)
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
-            navigate('/user')
+            navigate(redirectTo || '/user')
         } else {
             throw new Error(data.message)
         }
@@ -65,6 +66,7 @@ export const AuthProvider = ({children}) => {
             const refreshToken = authTokens?.refresh
             const newToken = {'refresh': refreshToken, 'access': data.access}
             setAuthTokens(newToken)
+            console.log(jwt_decode(data.access))
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(newToken))
         } else {
@@ -90,14 +92,13 @@ export const AuthProvider = ({children}) => {
     }
 
 
-
-
     let contextData = {
         user: user,
         authTokens: authTokens,
         loginUser: loginUser,
         logoutUser: logoutUser,
-        deleteAccount: deleteAccount
+        deleteAccount: deleteAccount,
+        updateToken: updateToken
     }
 
 

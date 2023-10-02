@@ -8,7 +8,8 @@ import {
 const { Sider } = Layout;
 
 const SideBar = ({ onMenuSelect, selectedItem, items }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  // Setzen Sie den Anfangszustand von "collapsed" abhängig von der Fenstergröße
+  const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -22,7 +23,7 @@ const SideBar = ({ onMenuSelect, selectedItem, items }) => {
         type="primary"
         onClick={toggleCollapsed}
         style={{ marginTop: 15, marginBottom: 15, position: 'absolute', left: 15, zIndex: 1 }}
-        >
+      >
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </Button>
       <Sider width={200} className={'sidebar'} collapsible collapsed={collapsed}>
@@ -33,12 +34,10 @@ const SideBar = ({ onMenuSelect, selectedItem, items }) => {
           style={{ height: '100%', borderRight: 0, marginTop: 60 }}
           className='Sidebar-items-wrapper'
           items={items}
-          />
-
+        />
       </Sider>
     </div>
-    );
+  );
 };
 
 export default SideBar;
-

@@ -54,7 +54,7 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    subscription_id = models.CharField(max_length=255, blank=True, null=True)
+    subscription_id = models.CharField(max_length=50, blank=True, null=True)
     subscription_end = models.DateField(blank=True, null=True)
 
     objects = AppUserManager()
@@ -103,3 +103,22 @@ class SubscriptionServices(models.Model):
 
     def __str__(self):
         return self.service
+
+
+class SubscriptionCodes(models.Model):
+    code = models.CharField(max_length=16, unique=True)
+    code_type = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    used_by = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return self.created_at
+
+
+class ReceivedPayments(models.Model):
+    transaction_id = models.CharField(max_length=16, unique=True)
+    user_mail = models.EmailField()
+
+    def __str__(self):
+        return self.user_mail

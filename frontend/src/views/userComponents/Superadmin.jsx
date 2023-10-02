@@ -1,4 +1,4 @@
-import SideBar from "../../components/User/SideBar.jsx";
+import SideBar from "../../components/SidebarElements/SideBar.jsx";
 import SuperDashboard from "../../components/User/SuperDashboard.jsx"
 import {Layout} from 'antd';
 import {useState, useEffect} from 'react'

@@ -1,5 +1,6 @@
 import json
-
+import paypalrestsdk
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import Group
@@ -7,7 +8,7 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import AppUser, SubscriptionPlan, SubscriptionServices
+from .models import AppUser, SubscriptionPlan, SubscriptionServices, ReceivedPayments
 from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -144,6 +145,7 @@ class LoginView(APIView):
         user.save()
 
         serializer = MyTokenObtainPairSerializer(data=request.data)
+
         if serializer.is_valid():
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         else:
@@ -432,6 +434,36 @@ class SubscriptionServicesListView(APIView):
 
 
 
+
+
+class ReceivedPaymentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Daten aus dem POST-Request extrahieren
+            data = json.loads(request.body)
+            transaction_id = data.get('transaction_id')
+            user_mail = data.get('user_mail')
+
+            print('transaction_id: ', transaction_id)
+            print('user_mail: ', user_mail)
+
+            # Versuche, den Eintrag zu finden; falls nicht vorhanden, erstelle einen neuen
+            payment, created = ReceivedPayments.objects.update_or_create(
+                user_mail=user_mail,
+                defaults={'transaction_id': transaction_id}
+            )
+
+            if created:
+                return Response({'message': 'Payment record successfully created'}, status=201)
+            else:
+                return Response({'message': 'Payment record successfully updated'}, status=200)
+
+        except Exception as e:
+            return Response({'status': 'error', 'message': str(e)}, status=400)
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ProcessWebHookView(View):
     def post(self, request):
@@ -463,8 +495,27 @@ class ProcessWebHookView(View):
 
         event_type = webhook_event["event_type"]
         if event_type == 'PAYMENT.SALE.COMPLETED':
-            subscription_id = webhook_event["resource"]["billing_agreement_id"]
 
-        print(event_type)
+            subscription_id = webhook_event["resource"]["billing_agreement_id"]
+            custom_id = webhook_event['resource']['custom']
+
+            try:
+                user = AppUser.objects.get(subscription_id=subscription_id)
+
+                #Falls der user gefunden wurde soll das Feld subscription_end aktualisiert werden. subscription_end soll heute in einem Monat liegen.
+                user.subscription_end = timezone.now() + timezone.timedelta(days=30)
+                user.save()
+
+            except AppUser.DoesNotExist:
+                payment = ReceivedPayments.objects.get(transaction_id=custom_id)
+                user_email = payment.user_mail
+
+                # Versuche, den Benutzer zu finden, der die Zahlung getätigt hat und aktualisiere das Feld subscription_id und subscription_end. Wobei subscription end heute in einem Monat liegt. AUsserdem soll is_admin auf True gesetzt werden.
+                user = AppUser.objects.get(email=user_email)
+                user.subscription_id = subscription_id
+                user.subscription_end = timezone.now() + timezone.timedelta(days=30)
+                user.is_admin = True
+                user.save()
+
 
         return HttpResponse()

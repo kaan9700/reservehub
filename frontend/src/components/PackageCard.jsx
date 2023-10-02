@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 
 const {Title, Text} = Typography;
 
-const PackageCard = ({service_package}) => {
+const PackageCard = ({service_package, viewState}) => {
     const includedServicesArray = service_package.included_services.split(',');
     const navigate = useNavigate(); // Router-History
 
@@ -36,10 +36,12 @@ const PackageCard = ({service_package}) => {
             <br/>
 
             {/* Button */}
+            {/* wenn viewstate false ist soll der button angezeigt werden */}
+            {viewState === false && (
             <Button type="primary" className='get-started-button' onClick={handleGetStartedClick}>
                 Los Geht's
             </Button>
-
+            )}
             {/* Divider */}
             <Divider/>
 

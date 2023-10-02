@@ -21,5 +21,6 @@ urlpatterns = [
     path('webhooks-paypal/', views.ProcessWebHookView.as_view(), name='webhook'),
     path('subscription-plans/', views.SubscriptionPlanListView.as_view(), name='subscription-plan-list'),
     path('subscription-services/', views.SubscriptionServicesListView.as_view(), name='subscription-services-list'),
+    path('received-payments/', views.ReceivedPaymentsView.as_view(), name='subscription-services-list'),
 
 ]

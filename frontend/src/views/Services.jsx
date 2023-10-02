@@ -54,7 +54,7 @@ const ServiceView = () => {
             <div className="service-view">
                 {packages.map((data) => {
                     return (
-                        <PackageCard key={data.id} service_package={data} />
+                        <PackageCard key={data.id} service_package={data} viewState={false} />
                     )
                 })}
             </div>

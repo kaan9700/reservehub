@@ -15,7 +15,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             token['role'] = 'admin'
         if user.is_superuser:
             token['role'] = 'superadmin'
-        else:
+
+        # Falls nutzer nicht is_admin oder is_superuser ist, dann ist er ein user
+        if not user.is_admin and not user.is_superuser:
             token['role'] = 'user'
 
         return token
