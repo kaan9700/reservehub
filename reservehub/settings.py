@@ -1,10 +1,8 @@
-
 from pathlib import Path
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -21,9 +19,8 @@ ALLOWED_HOSTS = [
     '172.20.10.7',
     '127.0.0.1',
     '192.168.178.59',
-    'bf04-2003-ef-5700-c800-4e0-99ef-f3bd-22af.ngrok-free.app'
+    'd95f-2003-ef-5700-c800-f0cd-edf8-f1a5-2a7c.ngrok-free.app'
 ]
-
 
 # Application definition
 
@@ -82,7 +79,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -152,12 +148,10 @@ PAYPAL_SECRET = 'EO_CC4qSjNvUWxEgYz1wos9oa_T8qN7DWWQYnr6aUaxIvWRNFCypYRjtmehf5Z0
 PAYPAL_MODE = 'live'  # Für Testzwecke. Ändern Sie dies in "live", wenn Sie live gehen.
 PAYPAL_WEBHOOK_ID = '40K34173K99863249'
 
-
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'k.erbay9700@gmail.com'
 EMAIL_HOST_PASSWORD = 'oynadasphayxkfco'
+

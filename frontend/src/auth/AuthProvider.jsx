@@ -28,7 +28,6 @@ export const AuthProvider = ({children}) => {
             body: JSON.stringify({'email': values.email, 'password': values.password})
         });
         const data = await response.json()
-        console.log("DATA", data.access)
         if (response.status === 200) {
             setAuthTokens(data)
             setUser(jwt_decode(data.access))
@@ -38,6 +37,7 @@ export const AuthProvider = ({children}) => {
             throw new Error(data.message)
         }
     }
+
 
     const logoutUser = async () => {
         try {
@@ -60,21 +60,27 @@ export const AuthProvider = ({children}) => {
             },
             body: JSON.stringify({'refresh': authTokens?.refresh})
         });
-        let data = await response.json()
+        let data = await response.json();
 
         if (response.status === 200) {
-            const refreshToken = authTokens?.refresh
-            const newToken = {'refresh': refreshToken, 'access': data.access}
-            setAuthTokens(newToken)
-            console.log(jwt_decode(data.access))
-            setUser(jwt_decode(data.access))
-            localStorage.setItem('authTokens', JSON.stringify(newToken))
-        } else {
-            logoutUser()
+            const refreshToken = authTokens?.refresh;
+            const newToken = {'refresh': refreshToken, 'access': data.access};
 
+            // Update the local state and local storage with the new token data
+            setAuthTokens(newToken);
+            console.log(jwt_decode(data.access));
+
+            // Extract the updated user data from the server response and update the local state
+            const updatedUser = data.user;
+            setUser(updatedUser);
+
+            localStorage.setItem('authTokens', JSON.stringify(newToken));
+        } else {
+            logoutUser();
         }
+
         if (loading) {
-            setLoading(false)
+            setLoading(false);
         }
     }
 
@@ -98,7 +104,6 @@ export const AuthProvider = ({children}) => {
         loginUser: loginUser,
         logoutUser: logoutUser,
         deleteAccount: deleteAccount,
-        updateToken: updateToken
     }
 
 
@@ -111,7 +116,7 @@ export const AuthProvider = ({children}) => {
             updateToken()
         }
 
-        let fourMinutes = 1000 * 60 * 4
+        let fourMinutes = 1000 * 60 * 0.25 // 15 Sekunden
 
         let interval = setInterval(() => {
             if (authTokens) {

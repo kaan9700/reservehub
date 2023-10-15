@@ -16,7 +16,7 @@ const BuyView = () => {
     const [service_package, setServicePackage] = useState(null);
     const navigate = useNavigate(); // Router-History
     const [loading, setLoading] = useState(false);
-    const {user, authTokens, updateToken} = useContext(AuthContext)
+    const {user, authTokens} = useContext(AuthContext)
     const uniqueTransactionID = uuidv4();
 
 
@@ -25,8 +25,8 @@ const BuyView = () => {
             return navigate('/login?redirectTo=/buy');
 
         }
+
         if (user.role !== 'user') {
-            console.log('TESTTTT')
             Notifications('error', {'message': 'Fehler', 'description': 'Dieser Account hat bereits ein Abo!'})
             navigate('/user');
         }
@@ -55,7 +55,6 @@ const BuyView = () => {
 
         // Die Funktion aufrufen
         prePaymentRequest();
-updateToken();
 
         const script = document.createElement('script');
         const clientID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
@@ -81,7 +80,7 @@ updateToken();
                             console.log(details);
                             Notifications('success', {
                                 'message': "Zahlungsvorgang erfolgreich!",
-                                'description': "Bitte check deine Mails nach einer Buchungsbestätigung"
+                                'description': "Bitte check deine Mails nach einer Buchungsbestätigung. Sobald "
                             });
 
                         });

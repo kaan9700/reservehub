@@ -1,6 +1,4 @@
 import json
-import paypalrestsdk
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import Group
@@ -25,6 +23,14 @@ from .models import PasswordToken, DeleteAccountToken
 from django.views.generic import View
 from paypalrestsdk import notifications
 from django.conf import settings
+from django_ratelimit.decorators import ratelimit
+
+
+
+
+
+
+
 
 
 @api_view(['GET'])
@@ -436,6 +442,8 @@ class SubscriptionServicesListView(APIView):
 
 
 
+
+@method_decorator(ratelimit(key='ip', rate='500/m', block=True), name='dispatch')
 class ReceivedPaymentsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -464,9 +472,18 @@ class ReceivedPaymentsView(APIView):
             return Response({'status': 'error', 'message': str(e)}, status=400)
 
 
+
+
 @method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(ratelimit(key='ip', rate='500/m', block=True), name='dispatch')
 class ProcessWebHookView(View):
     def post(self, request):
+
+        # Rate-Limiting überprüfen
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return HttpResponse(status=429)
+
         if "HTTP_PAYPAL_TRANSMISSION_ID" not in request.META:
             return HttpResponse(status=400)
 
@@ -498,24 +515,28 @@ class ProcessWebHookView(View):
 
             subscription_id = webhook_event["resource"]["billing_agreement_id"]
             custom_id = webhook_event['resource']['custom']
-
             try:
-                user = AppUser.objects.get(subscription_id=subscription_id)
+                try:
+                    user = AppUser.objects.get(subscription_id=subscription_id)
 
-                #Falls der user gefunden wurde soll das Feld subscription_end aktualisiert werden. subscription_end soll heute in einem Monat liegen.
-                user.subscription_end = timezone.now() + timezone.timedelta(days=30)
-                user.save()
+                    #Falls der user gefunden wurde soll das Feld subscription_end aktualisiert werden. subscription_end soll heute in einem Monat liegen.
+                    user.subscription_end = timezone.now() + timezone.timedelta(days=30)
+                    user.save()
 
-            except AppUser.DoesNotExist:
-                payment = ReceivedPayments.objects.get(transaction_id=custom_id)
-                user_email = payment.user_mail
+                except AppUser.DoesNotExist:
+                    payment = ReceivedPayments.objects.get(transaction_id=custom_id)
+                    user_email = payment.user_mail
 
-                # Versuche, den Benutzer zu finden, der die Zahlung getätigt hat und aktualisiere das Feld subscription_id und subscription_end. Wobei subscription end heute in einem Monat liegt. AUsserdem soll is_admin auf True gesetzt werden.
-                user = AppUser.objects.get(email=user_email)
-                user.subscription_id = subscription_id
-                user.subscription_end = timezone.now() + timezone.timedelta(days=30)
-                user.is_admin = True
-                user.save()
+                    # Versuche, den Benutzer zu finden, der die Zahlung getätigt hat und aktualisiere das Feld subscription_id und subscription_end. Wobei subscription end heute in einem Monat liegt. AUsserdem soll is_admin auf True gesetzt werden.
+                    user = AppUser.objects.get(email=user_email)
+                    user.subscription_id = subscription_id
+                    user.subscription_end = timezone.now() + timezone.timedelta(days=30)
+                    user.is_admin = True
+                    user.save()
+            except Exception as e:
+                print(f'Error while processing payment: {e}')
+                return HttpResponse(status=400)
 
 
-        return HttpResponse()
+        return HttpResponse(status=200)
+
