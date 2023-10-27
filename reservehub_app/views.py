@@ -511,6 +511,7 @@ class ProcessWebHookView(View):
         webhook_event = json.loads(event_body)
 
         event_type = webhook_event["event_type"]
+        print(event_type)
         if event_type == 'PAYMENT.SALE.COMPLETED':
 
             subscription_id = webhook_event["resource"]["billing_agreement_id"]
