@@ -37,6 +37,7 @@ const SignInForm = () => {
     const onFinish = async (values) => {
         setLoading(true)
         try {
+            values.email = values.email.toLowerCase();
             await loginUser(values, redirectTo);
         } catch (error) {
             Notifications('error', {'message': 'Fehler', 'description': error.message})

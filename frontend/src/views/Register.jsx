@@ -51,6 +51,7 @@ const SignUpForm = () => {
         console.log("Received values of form: ", values);
         setLoading(true);
         try {
+            values.email = values.email.toLowerCase();
             await makeRequest('POST', REGISTER, values);  // use values directly
             Notifications('success', {
                 'message': "Registrierung erfolgreich!",
