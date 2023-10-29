@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {
     Card,
     Typography,
@@ -14,10 +14,12 @@ import {
     Modal,
     Divider,
     List,
+    Switch
 } from 'antd';
 import {DeleteOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined,} from '@ant-design/icons';
 import {makeRequest} from "../../api/api.js";
 import {GET_PLANS, GET_SERVICES} from "../../api/endpoints.js";
+import AuthContext from "../../auth/AuthProvider.jsx";
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -36,11 +38,12 @@ const PlansSettings = () => {
     const serviceFormRef = useRef(null);
     const [reloadService, setReloadService] = useState(false);
     const [availableServices, setAvailableServices] = useState([]);
+    const {authTokens} = useContext(AuthContext)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await makeRequest('GET', GET_PLANS);
+                const data = await makeRequest('GET', GET_PLANS, {}, authTokens.access);
 
                 const updatedData = data.map(plan => {
                     if (plan.included_services) {
@@ -108,10 +111,12 @@ const PlansSettings = () => {
         }
     };
 
+
     const handleEditPlan = (plan) => {
         setFormValues(plan);
         setEditingPlan(plan);
     };
+
 
     const handleSavePlan = async () => {
 
@@ -144,6 +149,7 @@ const PlansSettings = () => {
         setEditingPlan(null);
     };
 
+
     const handleFormChange = changedFields => {
         setFormValues({
             ...formValues,
@@ -152,9 +158,11 @@ const PlansSettings = () => {
         });
     };
 
+
     const showModal = () => {
         setIsModalVisible(true);
     };
+
 
     const handleOk = async () => {
         try {
@@ -179,12 +187,12 @@ const PlansSettings = () => {
         }
     };
 
+
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
 
-    // Für Dienste
     const handleDeleteService = async (serviceId) => {
         try {
             const payload = {
@@ -198,10 +206,12 @@ const PlansSettings = () => {
         }
     };
 
+
     const handleEditService = (service) => {
         setFormValuesService(service);
         setEditingService(service);
     };
+
 
     const handleSaveService = async () => {
         try {
@@ -221,9 +231,11 @@ const PlansSettings = () => {
         setReloadService(!reloadService);
     };
 
+
     const handleCancelEditService = () => {
         setEditingService(null);
     };
+
 
     const handleServiceFormChange = (changedFields) => {
         setFormValuesService({
@@ -232,9 +244,11 @@ const PlansSettings = () => {
         });
     };
 
+
     const showServiceModal = () => {
         setIsServiceModalVisible(true);
     };
+
 
     const handleServiceOk = async () => {
         try {
@@ -253,6 +267,7 @@ const PlansSettings = () => {
             console.error("Failed to add service:", error);
         }
     };
+
 
     const handleServiceCancel = () => {
         setIsServiceModalVisible(false);
@@ -317,6 +332,9 @@ const PlansSettings = () => {
                                     <Form.Item label="Beschreibung" name="description">
                                         <Input/>
                                     </Form.Item>
+                                    <Form.Item label="Aktiv" name="active">
+                                        <Switch defaultChecked={editingPlan.active}/>
+                                    </Form.Item>
                                     <Form.Item label="Beinhaltende Dienste" name="included_services">
                                         <Select mode="multiple" style={{width: '100%'}}>
                                             {availableServices.map((service, idx) => (
@@ -333,12 +351,24 @@ const PlansSettings = () => {
                                         <Text strong>Plan-ID:</Text><br/>
                                         <Text strong>Preis:</Text><br/>
                                         <Text strong>Beschreibung:</Text><br/>
+                                        <Text strong>Aktiv:</Text><br/>
                                         <Text strong>Beinhaltende Dienste:</Text>
+
                                     </Col>
                                     <Col span={14} style={{textAlign: 'left'}}>
                                         <Text code>{plan.plan_id}</Text><br/>
                                         <Text>{plan.price} €</Text><br/>
                                         <Text>{plan.description}</Text><br/>
+                                        <Text>{plan.active ?
+                                            <Tag color="green" key={plan.active}>
+                                                Aktiviert
+                                            </Tag>
+                                            :
+
+                                            <Tag color="red" key={plan.active}>
+                                                Deaktiviert
+                                            </Tag>}
+                                        </Text><br/>
                                         <div>
                                             {plan.included_services && Array.isArray(plan.included_services) ? (
                                                 plan.included_services.map((service, idx) => (
@@ -350,6 +380,7 @@ const PlansSettings = () => {
                                                 <p>Keine inkludierten Services.</p>
                                             )}
                                         </div>
+
                                     </Col>
                                 </Row>
                             )}
@@ -435,19 +466,19 @@ const PlansSettings = () => {
                             </List.Item>
                         )}
                     />
-                     <Button type="primary" icon={<PlusOutlined/>} onClick={showServiceModal}
-                                style={{margin: '20px 0 20px 40px', float: 'left'}}>
-                            Neuer Dienst
-                        </Button>
-                        <Modal title="Neuer Dienst erstellen" open={isServiceModalVisible} onOk={handleServiceOk}
-                               onCancel={handleServiceCancel}>
-                            <Form layout="vertical" ref={serviceFormRef}
-                                  onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}>
-                                <Form.Item label="Dienst Name" name="service">
-                                    <Input/>
-                                </Form.Item>
-                            </Form>
-                        </Modal>
+                    <Button type="primary" icon={<PlusOutlined/>} onClick={showServiceModal}
+                            style={{margin: '20px 0 20px 40px', float: 'left'}}>
+                        Neuer Dienst
+                    </Button>
+                    <Modal title="Neuer Dienst erstellen" open={isServiceModalVisible} onOk={handleServiceOk}
+                           onCancel={handleServiceCancel}>
+                        <Form layout="vertical" ref={serviceFormRef}
+                              onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}>
+                            <Form.Item label="Dienst Name" name="service">
+                                <Input/>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
                 </div>
             </div>
         </>

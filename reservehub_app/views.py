@@ -319,7 +319,11 @@ class DeleteAccountConfirmView(APIView):
 
 class SubscriptionPlanListView(APIView):
     def get(self, request):
-        plans = SubscriptionPlan.objects.all()
+        if request.user.is_superuser:
+            plans = SubscriptionPlan.objects.all()
+        else:
+            plans = SubscriptionPlan.objects.filter(active=True)
+
         serializer = SubscriptionPlanSerializer(plans, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

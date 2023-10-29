@@ -93,6 +93,7 @@ class SubscriptionPlan(models.Model):
     plan_name = models.CharField(max_length=255)  # Name des Plans
     description = models.TextField()  # Beschreibung des Plans
     included_services = models.TextField()  # Beinhaltende Dienste als Textfeld
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.plan_name
