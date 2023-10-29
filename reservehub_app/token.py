@@ -26,7 +26,7 @@ class CustomTokenRefreshView(TokenRefreshView):
                     role = "staff"
                 else:
                     role = "user"
-                print("ROLE: ", role)
+
                 updated_data = {
                     'role': role,
                     'email': user.email,

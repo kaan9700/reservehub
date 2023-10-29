@@ -19,7 +19,7 @@ ALLOWED_HOSTS = [
     '172.20.10.7',
     '127.0.0.1',
     '192.168.178.59',
-    'd95f-2003-ef-5700-c800-f0cd-edf8-f1a5-2a7c.ngrok-free.app'
+    'f5bf-2003-ef-5700-c800-f4b7-d330-942-64d4.ngrok-free.app'
 ]
 
 # Application definition

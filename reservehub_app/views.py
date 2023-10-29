@@ -128,7 +128,7 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        print(email, password)
+
         if not email or not password:
             return Response({'message': 'Please provide both email and password'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -433,6 +433,7 @@ class SubscriptionServicesListView(APIView):
                 return Response({'error': 'Service does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
             service.delete()
+
             return Response({'status': 'Service deleted'}, status=status.HTTP_204_NO_CONTENT)
 
         else:
@@ -453,14 +454,14 @@ class ReceivedPaymentsView(APIView):
             data = json.loads(request.body)
             transaction_id = data.get('transaction_id')
             user_mail = data.get('user_mail')
+            plan_id = data.get('plan_id')
 
-            print('transaction_id: ', transaction_id)
-            print('user_mail: ', user_mail)
-
-            # Versuche, den Eintrag zu finden; falls nicht vorhanden, erstelle einen neuen
             payment, created = ReceivedPayments.objects.update_or_create(
                 user_mail=user_mail,
-                defaults={'transaction_id': transaction_id}
+                defaults={
+                    'transaction_id': transaction_id,
+                    'plan_id': plan_id
+                }
             )
 
             if created:
@@ -511,11 +512,12 @@ class ProcessWebHookView(View):
         webhook_event = json.loads(event_body)
 
         event_type = webhook_event["event_type"]
-        print(event_type)
+
         if event_type == 'PAYMENT.SALE.COMPLETED':
 
             subscription_id = webhook_event["resource"]["billing_agreement_id"]
             custom_id = webhook_event['resource']['custom']
+
             try:
                 try:
                     user = AppUser.objects.get(subscription_id=subscription_id)
@@ -534,6 +536,35 @@ class ProcessWebHookView(View):
                     user.subscription_end = timezone.now() + timezone.timedelta(days=30)
                     user.is_admin = True
                     user.save()
+
+                    # Get the plan_id from the payment record
+                    plan_id = payment.plan_id
+
+                    # Get the plan name from the plan_id
+                    plan_name = SubscriptionPlan.objects.get(plan_id=plan_id).plan_name
+
+                    # get the price from the plan_id
+                    price = SubscriptionPlan.objects.get(plan_id=plan_id).price
+                    c = {
+                        'email': user.email,
+                        'package_name': plan_name,
+                        'monthly_price': price,
+                    }
+
+                    subject_template_name = 'reservehub_app/subscription.txt'
+                    email_template_name = 'reservehub_app/subscription.html'
+                    subject = render_to_string(subject_template_name, c)
+                    subject = ''.join(subject.splitlines())
+                    email = render_to_string(email_template_name, c)
+
+
+
+
+
+
+                    send_mail(subject, email, 'k.erbay9700@gmail.com', [user.email], fail_silently=False)
+
+
             except Exception as e:
                 print(f'Error while processing payment: {e}')
                 return HttpResponse(status=400)

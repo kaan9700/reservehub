@@ -118,6 +118,7 @@ class SubscriptionCodes(models.Model):
 
 class ReceivedPayments(models.Model):
     transaction_id = models.CharField(max_length=16, unique=True)
+    plan_id = models.CharField(max_length=255)
     user_mail = models.EmailField()
 
     def __str__(self):

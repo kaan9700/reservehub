@@ -3,6 +3,7 @@ import jwt_decode from "jwt-decode";
 import {useNavigate} from 'react-router-dom'
 import {makeRequest} from "../api/api";
 import {LOGOUT, DELETE_ACCOUNT} from "../api/endpoints";
+import Notifications from "../components/Notifications.jsx";
 
 
 const AuthContext = createContext();
@@ -52,37 +53,49 @@ export const AuthProvider = ({children}) => {
     }
 
 
-    const updateToken = async () => {
-        const response = await fetch(BASE_URL + 'token/refresh', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({'refresh': authTokens?.refresh})
-        });
-        let data = await response.json();
+const updateToken = async () => {
+    const response = await fetch(BASE_URL + 'token/refresh', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({'refresh': authTokens?.refresh})
+    });
+    let data = await response.json();
 
-        if (response.status === 200) {
-            const refreshToken = authTokens?.refresh;
-            const newToken = {'refresh': refreshToken, 'access': data.access};
+    if (response.status === 200) {
+        const refreshToken = authTokens?.refresh;
+        const newToken = {'refresh': refreshToken, 'access': data.access};
 
-            // Update the local state and local storage with the new token data
-            setAuthTokens(newToken);
-            console.log(jwt_decode(data.access));
+        // Extract the updated user data from the server response
+        const updatedUser = data.user;
 
-            // Extract the updated user data from the server response and update the local state
-            const updatedUser = data.user;
-            setUser(updatedUser);
+        // Get the previous role from localStorage
+        const previousRole = localStorage.getItem('userRole');
 
-            localStorage.setItem('authTokens', JSON.stringify(newToken));
-        } else {
-            logoutUser();
+        // Check if the role has changed and log it
+        if (updatedUser.role && previousRole && updatedUser.role !== previousRole) {
+           Notifications('success', {'message': 'Rolle geändert', 'description': `Dein Account wurde zu ${updatedUser.role} geändert`})
         }
 
-        if (loading) {
-            setLoading(false);
-        }
+        // Save the updated role to localStorage for future reference
+        localStorage.setItem('userRole', updatedUser.role);
+
+        // Update the local state with the new user data and tokens
+        setUser(updatedUser);
+        setAuthTokens(newToken);
+
+        // Update the local storage with the new token data
+        localStorage.setItem('authTokens', JSON.stringify(newToken));
+    } else {
+        logoutUser();
     }
+
+    if (loading) {
+        setLoading(false);
+    }
+}
+
 
 
     const deleteAccount = async () => {

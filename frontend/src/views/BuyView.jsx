@@ -45,6 +45,7 @@ const BuyView = () => {
             try {
                 const data = {
                     transaction_id: uniqueTransactionID,
+                    plan_id: service_package.plan_id,
                     user_mail: user.email,
                 };
                 await makeRequest('POST', POST_TRANSACTION, data, authTokens.access);
@@ -80,7 +81,7 @@ const BuyView = () => {
                             console.log(details);
                             Notifications('success', {
                                 'message': "Zahlungsvorgang erfolgreich!",
-                                'description': "Bitte check deine Mails nach einer Buchungsbestätigung. Sobald "
+                                'description': "Bitte check deine Mails nach einer Buchungsbestätigung."
                             });
 
                         });
