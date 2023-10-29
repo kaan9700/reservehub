@@ -59,7 +59,7 @@ const User = ({users}) => {
             },
         });
     };
-
+    console.log(user)
     return (
         <div className={'standardUser-wrapper'} style={{
             display: 'flex',
@@ -71,8 +71,8 @@ const User = ({users}) => {
             <Card className={'standardUser'}
                   style={{marginTop: '50px', width: '70%', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'}}>
                 <Title level={2} style={{display: 'block'}}>Willkommen zurück!</Title>
-                <Text style={{display: 'block', marginTop: '10px'}}>Es scheint, dass Sie momentan kein aktives Abo
-                    haben.</Text>
+                <Text style={{display: 'block', marginTop: '10px'}}>Es scheint, dass Du momentan kein aktives Abo
+                    hast.</Text>
                 <Divider/>
                 <Descriptions title="Benutzerinformationen" layout="vertical" bordered>
                     <Descriptions.Item label="E-Mail">{user.email}</Descriptions.Item>
@@ -82,26 +82,9 @@ const User = ({users}) => {
                 </Descriptions>
 
                 <Divider/>
-                <div style={{marginBottom: '20px'}}>
-                    <Title level={4}>Aktivieren Sie Ihre Pro-Einstellungen</Title>
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                    }}>
-                        <Input
-                            value={activationCode}
-                            onChange={(e) => setActivationCode(e.target.value)}
-                            placeholder="Aktivierungscode eingeben"
-                            style={{marginRight: '10px'}}
-                        />
-                        <Button type="primary" onClick={handleActivatePro}>Aktivieren</Button>
-                    </div>
-                    {codeError && <Text type="danger" style={{marginTop: '10px'}}>{codeError}</Text>}
-                    <div style={{marginBottom: '40px'}}></div>
+                <div>
                     <Button type="primary" size="large" onClick={() => navigate('/services')}>
-                        Entdecken Sie unsere Dienste
+                        Entdecke unsere Dienste
                     </Button>
                 </div>
 

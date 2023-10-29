@@ -31,6 +31,7 @@ class CustomTokenRefreshView(TokenRefreshView):
                     'role': role,
                     'email': user.email,
                     'phone': user.phone,
+                    'registeredDate': user.registeredDate,
                     # Add other required fields here
                 }
 

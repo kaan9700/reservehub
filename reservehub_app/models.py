@@ -49,6 +49,7 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=500)
     email_confirmed = models.BooleanField(default=False)
     phone = models.CharField(max_length=20)
+    registeredDate = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
