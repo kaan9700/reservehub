@@ -199,7 +199,9 @@ button:focus-visible {
 }
 
 .dashboard-title {
-    padding-left: 40px;
+    margin: 20px 0;
+    padding-left: 30px;
+    text-align: left;
 }
 
 
@@ -290,7 +292,7 @@ button:focus-visible {
 
 @media (max-width: 767px) {
 
-    .Card{
+    .Card {
         min-width: 100%;
 
     }
@@ -343,7 +345,7 @@ button:focus-visible {
         font-size: 14px
     }
 
-    .dashboard-chart{
+    .dashboard-chart {
         min-width: 100%;
     }
 
@@ -396,7 +398,7 @@ button:focus-visible {
     margin-left: 40px;
 }
 
-.Card{
+.Card {
     width: 250px;
 }
 
@@ -433,9 +435,34 @@ button:focus-visible {
     overflow: hidden;
 }
 
-.dashboard-visuals{
+.dashboard-visuals {
     margin-bottom: 100px;
 }
 
 
+.input-width, .profil-settings-email-notification-spacer div {
+    width: 100%;
+}
 
+.form-item-container {
+    display: flex;
+    padding: 20px 0
+}
+
+.form-item-label {
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-item-container > span {
+    max-width: 50%;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .responsive-card {
+        flex: 0 0 100%;
+        margin-bottom: 20px; /* Für Abstand zwischen den Cards */
+    }
+}

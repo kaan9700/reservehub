@@ -32,15 +32,6 @@ const User = ({users}) => {
         setLoading(false);
     };
 
-    const handleActivatePro = () => {
-        if (activationCode === '123456') {  // Dummy-Überprüfung
-            console.log('Pro-Einstellungen aktiviert!');
-            setCodeError(null);
-        } else {
-            setCodeError('Ungültiger Aktivierungscode.');
-        }
-    };
-
     const showModal = () => {
         confirm({
             title: 'Wollen Sie wirklich Ihren Account löschen?',
@@ -50,7 +41,6 @@ const User = ({users}) => {
             okButtonProps: {danger: true},
             cancelButtonProps: {autoFocus: false},
             cancelText: 'Abbrechen',
-            centered: true,
             onOk() {
                 handleDeleteUser()
             },
@@ -59,7 +49,7 @@ const User = ({users}) => {
             },
         });
     };
-    console.log(user)
+
     return (
         <div className={'standardUser-wrapper'} style={{
             display: 'flex',

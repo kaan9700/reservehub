@@ -19,7 +19,7 @@ import BuyView from "./views/BuyView.jsx";
 import PasswordReset from "./views/PasswordReset.jsx";
 import SetNewPassword from "./views/SetNewPassword.jsx";
 import DeleteAccountView from "./views/DeleteAccount.jsx";
-
+import RestaurantProfile from "./components/business_template.jsx";
 
 function App() {
     const {user} = useContext(AuthContext)
@@ -28,15 +28,17 @@ function App() {
         <>
             <NavBar/>
             <Routes>
-                <Route path='/test' element={<Test/>}/>
                 <Route path='/register' element={<Register/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/home' element={<Home/>}/>
+                <Route path='/' element={<Home/>}/>
+                <Route path='*' element={<Home/>}/>
                 <Route path='/about' element={<About/>}/>
                 <Route path='/services' element={<Services/>}/>
                 <Route path="/service/:id" element={<ServiceInfo/>}/>
                 <Route path="/buy" element={<BuyView/>}/>
                 <Route path="/password-reset" element={<PasswordReset/>}/>
+                <Route path="/test" element={<RestaurantProfile/>}/>
+
                 <Route
                     path="/set-new-password/:uid/:token"
                     element={<SetNewPassword/>}
@@ -55,6 +57,7 @@ function App() {
                 </Route>
 
             </Routes>
+
             <AppFooter/>
         </>
     )

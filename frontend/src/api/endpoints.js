@@ -20,3 +20,7 @@ export const GET_SERVICES = BASE_URL + "subscription-services/"
 
 export const POST_TRANSACTION = BASE_URL + "received-payments/"
 
+export const GET_USERINFORMATION = BASE_URL + "get-userinformation/"
+
+export const GET_BUSINESSINFORMATION = BASE_URL + "get-businessinformation/"
+

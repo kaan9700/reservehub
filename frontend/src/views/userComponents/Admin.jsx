@@ -42,7 +42,6 @@ const Admin = () => {
             label: 'Einstellungen',
             children: [
                 { key: 'profile-settings', icon: <UserOutlined />, label: 'Profil' },
-                { key: 'app-settings', icon: <AppstoreOutlined />, label: 'App' },
                 { key: 'reservation-settings', icon: <ReadOutlined />, label: 'Reservierung' },
                 ],
         },

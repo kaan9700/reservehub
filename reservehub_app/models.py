@@ -55,6 +55,11 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    reservation_notifications = models.BooleanField(default=True)
+    requests_notifications = models.BooleanField(default=True)
+    newsletter_notifications = models.BooleanField(default=True)
+
+
     subscription_id = models.CharField(max_length=50, blank=True, null=True)
     subscription_end = models.DateField(blank=True, null=True)
 
@@ -85,6 +90,22 @@ class DeleteAccountToken(models.Model):
     token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+class Business(models.Model):
+    app_user_id = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    business_type = models.CharField(max_length=255)
+    street = models.CharField(max_length=255)
+    street_number = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    opening_hours = models.CharField(max_length=255)
+    closing_hours = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    website = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 

@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import AppUser, SubscriptionPlan, SubscriptionServices, ReceivedPayments
+from .models import AppUser, SubscriptionPlan, SubscriptionServices, ReceivedPayments, Business
 from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -315,6 +315,167 @@ class DeleteAccountConfirmView(APIView):
         # Füge einen Standardfall hinzu
         return Response({"message": "Ungültiger Token oder Benutzer existiert nicht."},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserInformation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user is None:
+            return Response({'message': 'Kein Benutzer gefunden'}, status=400)
+
+        email = user.email
+        phone = user.phone
+        reservation_notifications = user.reservation_notifications
+        requests_notifications = user.requests_notifications
+        newsletter_notifications = user.newsletter_notifications
+        # Erstelle ein Dictionary mit den Daten
+        data = {
+            'email': email,
+            'phone': phone,
+            'reservation_notifications': reservation_notifications,
+            'requests_notifications': requests_notifications,
+            'newsletter_notifications': newsletter_notifications
+        }
+        # Gebe das Dictionary zurück
+        return Response(data, status=200)
+
+    def post(self, request):
+        user = request.user
+        if user is None:
+            return Response({'message': 'Kein Benutzer gefunden'}, status=400)
+
+        email = request.data.get('email')
+        phone = request.data.get('phone')
+        reservation_notifications = request.data.get('reservations')
+        requests_notifications = request.data.get('requests')
+        newsletter_notifications = request.data.get('reservations')
+        #set the new values for the user
+        user.email = email
+        user.phone = phone
+        user.reservation_notifications = reservation_notifications
+        user.requests_notifications = requests_notifications
+        user.newsletter_notifications = newsletter_notifications
+
+        #save the user
+        user.save()
+
+        return Response({'message': 'Benutzerinformationen erfolgreich aktualisiert'}, status=200)
+
+
+
+class BusinessInformation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user is None:
+            return Response({'message': 'Kein Benutzer gefunden'}, status=400)
+
+        email = user.email
+
+        # Get id of the user
+        user_id = user.id
+
+        # get the business of the user if it exists from Business model
+        try:
+            business = Business.objects.get(app_user_id=user_id)
+
+            # get all the information
+            business_name = business.name
+            business_type = business.business_type
+            business_street = business.street
+            business_street_number = business.street_number
+            business_zip_code = business.zip_code
+            business_city = business.city
+            business_opening_hours = business.opening_hours
+            business_closing_hours = business.closing_hours
+            business_phone = business.phone
+            business_website = business.website
+
+            # Erstelle ein Dictionary mit den Daten
+            data = {
+                'business_name': business_name,
+                'business_type': business_type,
+                'street': business_street,
+                'house_number': business_street_number,
+                'postal_code': business_zip_code,
+                'city': business_city,
+                'opening_from': business_opening_hours,
+                'opening_to': business_closing_hours,
+                'phone': business_phone,
+                'website': business_website
+            }
+            # Gebe das Dictionary zurück
+            return Response(data, status=200)
+
+        except Business.DoesNotExist:
+            # create a dictionary with the data
+            data = {
+                'business_name': '',
+                'business_type': '',
+                'street': '',
+                'house_number': '',
+                'postal_code': '',
+                'city': '',
+                'opening_from': 8,
+                'opening_to': 22,
+                'phone': '',
+                'website': ''
+
+            }
+            # return the dictionary
+            return Response(data, status=200)
+
+    def post(self, request):
+        user = request.user
+        if user is None:
+            return Response({'message': 'Kein Benutzer gefunden'}, status=400)
+
+        # Get id of the user
+        user_id = user.id
+        app_user_instance = AppUser.objects.get(id=user_id)
+
+        # get all the information
+        business_name = request.data.get('businessName')
+        business_type = request.data.get('businessType')
+        business_street = request.data.get('street')
+        business_street_number = request.data.get('houseNumber')
+        business_zip_code = request.data.get('postalCode')
+        business_city = request.data.get('city')
+        business_opening_hours = request.data.get('openingFrom')
+        business_closing_hours = request.data.get('openingTo')
+        business_phone = request.data.get('phone')
+        business_website = request.data.get('website')
+        print(request.data)
+        # Versuche, das Geschäft des Benutzers zu finden
+        try:
+            business = Business.objects.get(app_user_id=app_user_instance)
+        except Business.DoesNotExist:
+            # Wenn das Geschäft nicht existiert, erstelle eine neue Instanz
+            business = Business(app_user_id=app_user_instance)
+
+        # Setze die Werte für das Geschäft, unabhängig davon, ob es neu oder existierend ist
+        business.name = business_name
+        business.business_type = business_type
+        business.street = business_street
+        business.street_number = business_street_number
+        business.zip_code = business_zip_code
+        business.city = business_city
+        business.opening_hours = business_opening_hours
+        business.closing_hours = business_closing_hours
+        business.phone = business_phone
+        business.website = business_website
+
+        # Speichere das Geschäft
+        business.save()
+
+        return Response({'message': 'Geschäftsinformationen erfolgreich aktualisiert'}, status=200)
+
+
+##### PAYMENT STUFF
 
 
 class SubscriptionPlanListView(APIView):

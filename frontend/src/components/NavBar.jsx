@@ -57,8 +57,8 @@ const NavBar = () => {
     const commonItems = [
         {
             label: "Home",
-            key: "home",
-            icon: current === "home" ? <HomeFilled/> : <HomeOutlined/>,
+            key: "",
+            icon: current === "" ? <HomeFilled/> : <HomeOutlined/>,
         },
         {
             label: "About",
