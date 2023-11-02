@@ -94,7 +94,7 @@ class DeleteAccountToken(models.Model):
 class Business(models.Model):
     app_user_id = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    business_type = models.CharField(max_length=255)
+    business_type = models.ForeignKey('BusinessType', on_delete=models.CASCADE)
     street = models.CharField(max_length=255)
     street_number = models.CharField(max_length=255)
     zip_code = models.CharField(max_length=255)
@@ -107,7 +107,11 @@ class Business(models.Model):
     def __str__(self):
         return self.name
 
+class BusinessType(models.Model):
+    business_type = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.business_type
 
 class SubscriptionPlan(models.Model):
     plan_id = models.CharField(max_length=255, unique=True)  # Eindeutige ID für den Plan

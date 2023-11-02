@@ -180,7 +180,7 @@ const Store = () => {
             },
         });
     };
-    console.log(parseInt(editedData.openingFrom))
+
     return (
         <>
             <Title level={3} className={'dashboard-title'}>Geschäft</Title>

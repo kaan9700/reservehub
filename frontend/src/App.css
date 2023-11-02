@@ -466,3 +466,11 @@ button:focus-visible {
         margin-bottom: 20px; /* Für Abstand zwischen den Cards */
     }
 }
+
+.services-edit-wrapper{
+    padding-bottom: 100px;
+}
+
+.services-edit-wrapper > button{
+    margin: 20px 0 20px 40px;
+}

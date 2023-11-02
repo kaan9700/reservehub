@@ -20,6 +20,7 @@ import {DeleteOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined,
 import {makeRequest} from "../../api/api.js";
 import {GET_PLANS, GET_SERVICES} from "../../api/endpoints.js";
 import AuthContext from "../../auth/AuthProvider.jsx";
+import DataEditor from "../DataEditor.jsx";
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -31,7 +32,7 @@ const PlansSettings = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [reload, setReload] = useState(false);
     const formRef = useRef(null);
-    const [services, setServices] = useState([]); //
+    const [services, setServices] = useState([]);
     const [editingService, setEditingService] = useState(null);
     const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
     const [formValuesService, setFormValuesService] = useState({});
@@ -417,68 +418,10 @@ const PlansSettings = () => {
                     </Form>
                 </Modal>
                 <Divider/>
-                <div>
+                <div className={'services-edit-wrapper'}>
                     <Title level={3} className={'dashboard-title'}
                            style={{textAlign: 'left', padding: '0 0 0 40px'}}>Dienste</Title>
-                    <List
-                        bordered
-                        dataSource={services}
-                        style={{marginLeft: '40px', background: 'white'}}
-                        renderItem={service => (
-                            <List.Item
-                                actions={[
-                                    editingService?.id === service.id ? (
-                                        <>
-                                            <Button type="text" icon={<SaveOutlined/>}
-                                                    onClick={() => handleSaveService(service.id)}/>
-                                            <Button type="text" icon={<CloseOutlined/>}
-                                                    onClick={handleCancelEditService}/>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Popconfirm
-                                                title="Sind Sie sicher, dass Sie diesen Dienst löschen möchten?"
-                                                onConfirm={() => handleDeleteService(service.id)} okText="Ja"
-                                                cancelText="Nein"
-                                            >
-                                                <Button type="text" icon={<DeleteOutlined/>} style={{color: 'red'}}/>
-                                            </Popconfirm>
-                                            <Button type="text" icon={<EditOutlined/>}
-                                                    onClick={() => handleEditService(service)}/>
-                                        </>
-                                    )
-                                ]}
-                            >
-                                {editingService?.id === service.id ? (
-                                    <Form
-                                        layout="vertical"
-                                        onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}
-                                        initialValues={service}
-
-                                    >
-                                        <Form.Item name="service" style={{margin: '0'}}>
-                                            <Input/>
-                                        </Form.Item>
-                                    </Form>
-                                ) : (
-                                    service.service
-                                )}
-                            </List.Item>
-                        )}
-                    />
-                    <Button type="primary" icon={<PlusOutlined/>} onClick={showServiceModal}
-                            style={{margin: '20px 0 20px 40px', float: 'left'}}>
-                        Neuer Dienst
-                    </Button>
-                    <Modal title="Neuer Dienst erstellen" open={isServiceModalVisible} onOk={handleServiceOk}
-                           onCancel={handleServiceCancel}>
-                        <Form layout="vertical" ref={serviceFormRef}
-                              onValuesChange={(changedFields) => handleServiceFormChange(changedFields)}>
-                            <Form.Item label="Dienst Name" name="service">
-                                <Input/>
-                            </Form.Item>
-                        </Form>
-                    </Modal>
+                   <DataEditor ENDPOINT={GET_SERVICES}/>
                 </div>
             </div>
         </>

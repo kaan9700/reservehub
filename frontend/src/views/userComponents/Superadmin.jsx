@@ -9,9 +9,13 @@ import {
     SettingOutlined,
     UserOutlined,
     AppstoreOutlined,
+    EuroCircleOutlined,
 } from '@ant-design/icons';
 import Reservations from "../../components/User/Reservations.jsx";
 import PlansSettings from "../../components/SidebarElements/PlansSettings.jsx";
+import SuperAppSettings from "../../components/SidebarElements/SuperAppSettings.jsx";
+
+
 
 const Superadmin = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
@@ -32,7 +36,7 @@ const Superadmin = () => {
 
     const SidebarItems = [
         {key: 'dashboard', icon: <DashboardOutlined/>, label: 'Dashboard'},
-        {key: 'packages', icon: <ShopOutlined/>, label: 'Pakete'},
+        {key: 'packages', icon: <EuroCircleOutlined/>, label: 'Pakete'},
         {
             key: 'settings',
             icon: <SettingOutlined/>,
@@ -60,7 +64,7 @@ const Superadmin = () => {
             content = <PlansSettings/>;
             break;
         case 'app-settings':
-            content = <PlansSettings/>;
+            content = <SuperAppSettings/>;
             break;
         case 'reservation-settings':
             content = <PlansSettings/>;

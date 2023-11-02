@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import AppUser, SubscriptionPlan, SubscriptionServices, ReceivedPayments, Business
+from .models import AppUser, SubscriptionPlan, SubscriptionServices, ReceivedPayments, Business, BusinessType
 from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,7 +18,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils import timezone
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-from .utils import MyTokenObtainPairSerializer, SubscriptionPlanSerializer, SubscriptionServicesSerializer
+from .utils import MyTokenObtainPairSerializer, SubscriptionPlanSerializer, SubscriptionServicesSerializer, BusinessTypeSerializer
 from .models import PasswordToken, DeleteAccountToken
 from django.views.generic import View
 from paypalrestsdk import notifications
@@ -449,7 +449,7 @@ class BusinessInformation(APIView):
         business_closing_hours = request.data.get('openingTo')
         business_phone = request.data.get('phone')
         business_website = request.data.get('website')
-        print(request.data)
+
         # Versuche, das Geschäft des Benutzers zu finden
         try:
             business = Business.objects.get(app_user_id=app_user_instance)
@@ -473,6 +473,77 @@ class BusinessInformation(APIView):
         business.save()
 
         return Response({'message': 'Geschäftsinformationen erfolgreich aktualisiert'}, status=200)
+
+
+
+
+
+class BusinessTypesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        business_types = BusinessType.objects.all()
+        serializer = BusinessTypeSerializer(business_types, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        method_type = request.data.get('method')
+
+        if method_type == 'add':
+
+            data = {key: value for key, value in request.data.items() if key != 'method'}
+            if 'type' in data:
+                data['business_type'] = data.pop('type')
+            serializer = BusinessTypeSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif method_type == 'change':
+            old_type_data = request.data.get('old_data')
+            old_type_id = old_type_data.get('id')
+            new_type_data = request.data.get('new_data')
+            new_type_data.pop('old_type_id', None)
+            if 'type' in new_type_data:
+                new_type_data['business_type'] = new_type_data.pop('type')
+            try:
+                existing_type = BusinessType.objects.get(id=old_type_id)
+            except BusinessType.DoesNotExist:
+                return Response({'error': 'Type does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = BusinessTypeSerializer(existing_type, data=new_type_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif method_type == 'delete':
+            type_id = request.data.get('type_id')
+            try:
+                business_type = BusinessType.objects.get(id=type_id)
+            except BusinessType.DoesNotExist:
+                return Response({'error': 'Type does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+            business_type.delete()
+            return Response({'status': 'Type deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+        else:
+            return Response({'error': 'Invalid method type'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##### PAYMENT STUFF
@@ -557,6 +628,7 @@ class SubscriptionPlanListView(APIView):
 
 class SubscriptionServicesListView(APIView):
     def get(self, request):
+
         services = SubscriptionServices.objects.all()
         serializer = SubscriptionServicesSerializer(services, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -566,6 +638,8 @@ class SubscriptionServicesListView(APIView):
 
         if method_type == 'add':
             data = {key: value for key, value in request.data.items() if key != 'method'}
+            if 'type' in data:
+                data['service'] = data.pop('type')
             serializer = SubscriptionServicesSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -577,7 +651,8 @@ class SubscriptionServicesListView(APIView):
             old_service_id = old_service_data.get('id')
             new_service_data = request.data.get('new_data')  # Nehmen wir an, dass die neuen Daten unter dem Schlüssel 'new_data' geschickt werden.
             new_service_data.pop('old_service_id', None)
-
+            if 'type' in new_service_data:
+                new_service_data['service'] = new_service_data.pop('type')
             try:
                 existing_service = SubscriptionServices.objects.get(id=old_service_id)
             except SubscriptionServices.DoesNotExist:
@@ -591,7 +666,8 @@ class SubscriptionServicesListView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif method_type == 'delete':
-            service_id = request.data.get('service_id')
+
+            service_id = request.data.get('type_id')
             try:
                 service = SubscriptionServices.objects.get(id=service_id)
             except SubscriptionServices.DoesNotExist:

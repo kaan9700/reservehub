@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import serializers
-from .models import SubscriptionPlan, SubscriptionServices
+from .models import SubscriptionPlan, SubscriptionServices, BusinessType
 
 
 
@@ -35,4 +35,10 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
 class SubscriptionServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubscriptionServices
+        fields = '__all__'
+
+
+class BusinessTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessType
         fields = '__all__'

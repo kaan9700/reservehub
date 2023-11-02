@@ -24,3 +24,4 @@ export const GET_USERINFORMATION = BASE_URL + "get-userinformation/"
 
 export const GET_BUSINESSINFORMATION = BASE_URL + "get-businessinformation/"
 
+export const GET_BUSINESSTYPE = BASE_URL + "get-businesstypes/"
