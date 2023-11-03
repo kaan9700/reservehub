@@ -380,7 +380,7 @@ class BusinessSettings(APIView):
         # get the business of the user if it exists from Business model
         try:
             business = Business.objects.get(app_user_id=user_id)
-            return Response({'message': 123}, status=200)
+            return Response({'message': 'Success'}, status=200)
         except Business.DoesNotExist:
             return Response({}, status=200)
 
@@ -402,7 +402,7 @@ class BusinessInformation(APIView):
 
             # get all the information
             business_name = business.name
-            business_type = business.business_type
+            business_type = business.business_type.business_type
             business_street = business.street
             business_street_number = business.street_number
             business_zip_code = business.zip_code
@@ -454,10 +454,11 @@ class BusinessInformation(APIView):
         # Get id of the user
         user_id = user.id
         app_user_instance = AppUser.objects.get(id=user_id)
-
+        print(request.data)
         # get all the information
         business_name = request.data.get('businessName')
         business_type = request.data.get('businessType')
+        business_type_instance = BusinessType.objects.get(business_type=business_type)
         business_street = request.data.get('street')
         business_street_number = request.data.get('houseNumber')
         business_zip_code = request.data.get('postalCode')
@@ -476,7 +477,7 @@ class BusinessInformation(APIView):
 
         # Setze die Werte für das Geschäft, unabhängig davon, ob es neu oder existierend ist
         business.name = business_name
-        business.business_type = business_type
+        business.business_type = business_type_instance
         business.street = business_street
         business.street_number = business_street_number
         business.zip_code = business_zip_code

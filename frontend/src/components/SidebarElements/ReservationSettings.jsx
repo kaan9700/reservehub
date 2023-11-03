@@ -15,7 +15,8 @@ const ReservationSettings = () => {
             const response = await makeRequest('GET', GET_BUSINESSSETTINGS, {}, authTokens.access);
             console.log(response);
             // check if response is {}
-            if (Object.keys(response).length !== 0 && response.constructor !== Object) {
+            if (Object.keys(response).length !== 0) {
+                console.log("response is not empty");
                 setBusinessSettings(response);
             }
         };

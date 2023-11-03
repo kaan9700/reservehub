@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import {Typography, Layout, Input, Select, Upload, Button, Modal, Form, Row, Col, Card, Space} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {makeRequest} from "../api/api.js";
-import {GET_BUSINESSINFORMATION} from "../api/endpoints.js";
+import {GET_BUSINESSINFORMATION, GET_BUSINESSTYPE} from "../api/endpoints.js";
 import AuthContext from "../auth/AuthProvider.jsx";
 
 const {Title} = Typography;
@@ -21,8 +21,16 @@ const getBase64 = (file) => {
 const Store = () => {
 
     const {authTokens} = useContext(AuthContext)
-    const [loading, setLoading] = useState(true);
 
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [fileList, setFileList] = useState([]);
+    const [pdfList, setPdfList] = useState([]);
+
+
+    const [loading, setLoading] = useState(true);
+    const [typeList, setTypeList] = useState([]);
     const [initialState, setInitialState] = useState({
         businessName: "",
         businessType: "",
@@ -53,21 +61,17 @@ const Store = () => {
         pictures: [],
     });
 
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewImage, setPreviewImage] = useState('');
-    const [previewTitle, setPreviewTitle] = useState('');
-    const [fileList, setFileList] = useState([]);
-    const [pdfList, setPdfList] = useState([]);
-
     const handleCancel = () => setPreviewOpen(false);
 
 
     useEffect(() => {
+        console.log('test')
         const fetchData = async () => {
+            console.log('test2')
             try {
 
                 const response = await makeRequest('GET', GET_BUSINESSINFORMATION, {}, authTokens.access)
-
+                console.log(response)
 
                 setEditedData({
                     businessName: response.business_name,
@@ -104,9 +108,20 @@ const Store = () => {
             } catch (e) {
                 console.log(e);
             }
+
+            try {
+
+                const response = await makeRequest('GET', GET_BUSINESSTYPE, {}, authTokens.access)
+                const newTypeList = response.map(item => item.business_type);
+                setTypeList(newTypeList);
+            } catch (e) {
+                console.log(e);
+            }
+
+            setLoading(false)
         }
         fetchData()
-        setLoading(false)
+
     }, []);
 
 
@@ -160,8 +175,7 @@ const Store = () => {
 
         }
 
-        const response = await makeRequest('POST', GET_BUSINESSINFORMATION, data, authTokens.access)
-
+        await makeRequest('POST', GET_BUSINESSINFORMATION, data, authTokens.access)
     };
 
     const showModal = () => {
@@ -203,10 +217,9 @@ const Store = () => {
                                            rules={[{required: true, message: 'Bitte Geschäftsart auswählen'}]}>
                                     <Select defaultValue={editedData.businessType} style={{width: '100%'}}
                                             onChange={value => handleInputChange('businessType', value)}>
-                                        <Option value="Restaurant">Restaurant</Option>
-                                        <Option value="Bar">Bar</Option>
-                                        <Option value="Cafe">Cafe</Option>
-                                        <Option value="Friseur">Friseur</Option>
+                                        {typeList.map(type => (
+                                            <Option key={type} value={type}>{type}</Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -229,8 +242,10 @@ const Store = () => {
                                     <div style={{display: 'flex', flexDirection: 'row', gap: '15px'}}>
                                         <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                             <span>Von: </span>
-                                            <Select defaultValue={editedData.openingFrom ? parseInt(editedData.openingFrom) : undefined} style={{width: '90px'}}
-                                                    onChange={value => handleInputChange('openingFrom', value)}>
+                                            <Select
+                                                defaultValue={editedData.openingFrom ? parseInt(editedData.openingFrom) : undefined}
+                                                style={{width: '90px'}}
+                                                onChange={value => handleInputChange('openingFrom', value)}>
 
                                                 {Array.from({length: 24}, (_, i) => (
                                                     <Option key={i} value={i}>{i}:00</Option>
@@ -240,8 +255,10 @@ const Store = () => {
                                         </div>
                                         <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                             <span style={{margin: '0 1%'}}>bis:</span>
-                                            <Select defaultValue={editedData.openingTo ? parseInt(editedData.openingTo) : undefined} style={{width: '90px'}}
-                                                    onChange={value => handleInputChange('openingTo', value)}>
+                                            <Select
+                                                defaultValue={editedData.openingTo ? parseInt(editedData.openingTo) : undefined}
+                                                style={{width: '90px'}}
+                                                onChange={value => handleInputChange('openingTo', value)}>
 
                                                 {Array.from({length: 24}, (_, i) => (
                                                     <Option key={i} value={i}>{i}:00</Option>
