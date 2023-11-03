@@ -366,6 +366,25 @@ class UserInformation(APIView):
 
 
 
+
+class BusinessSettings(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        if user is None:
+            return Response({'message': 'Kein Benutzer gefunden'}, status=400)
+
+        # Get id of the user
+        user_id = user.id
+
+        # get the business of the user if it exists from Business model
+        try:
+            business = Business.objects.get(app_user_id=user_id)
+            return Response({'message': 123}, status=200)
+        except Business.DoesNotExist:
+            return Response({}, status=200)
+
+
 class BusinessInformation(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -373,8 +392,6 @@ class BusinessInformation(APIView):
         user = request.user
         if user is None:
             return Response({'message': 'Kein Benutzer gefunden'}, status=400)
-
-        email = user.email
 
         # Get id of the user
         user_id = user.id
@@ -420,8 +437,8 @@ class BusinessInformation(APIView):
                 'house_number': '',
                 'postal_code': '',
                 'city': '',
-                'opening_from': 8,
-                'opening_to': 22,
+                'opening_from': None,
+                'opening_to': None,
                 'phone': '',
                 'website': ''
 

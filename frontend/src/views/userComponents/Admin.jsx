@@ -13,6 +13,7 @@ import {
     AppstoreOutlined,
     ShopOutlined,
 } from '@ant-design/icons';
+import ReservationSettings from "../../components/SidebarElements/ReservationSettings.jsx";
 
 const Admin = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
@@ -65,7 +66,7 @@ const Admin = () => {
             content = <ProfileSettings />;
             break;
         case 'reservation-settings':
-            content = <ProfileSettings />;
+            content = <ReservationSettings />;
             break;
         default:
         content = <Dashboard />;

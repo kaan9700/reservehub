@@ -137,7 +137,6 @@ const Store = () => {
             ...prevState,
             [name]: value,
         }));
-        console.log(editedData)
     };
 
     const dataHasChanged = JSON.stringify(initialState) !== JSON.stringify(editedData);
@@ -160,7 +159,7 @@ const Store = () => {
 
 
         }
-        console.log(data)
+
         const response = await makeRequest('POST', GET_BUSINESSINFORMATION, data, authTokens.access)
 
     };
@@ -180,6 +179,7 @@ const Store = () => {
             },
         });
     };
+
 
     return (
         <>
@@ -229,7 +229,7 @@ const Store = () => {
                                     <div style={{display: 'flex', flexDirection: 'row', gap: '15px'}}>
                                         <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                             <span>Von: </span>
-                                            <Select defaultValue={parseInt(editedData.openingFrom)} style={{width: '90px'}}
+                                            <Select defaultValue={editedData.openingFrom ? parseInt(editedData.openingFrom) : undefined} style={{width: '90px'}}
                                                     onChange={value => handleInputChange('openingFrom', value)}>
 
                                                 {Array.from({length: 24}, (_, i) => (
@@ -240,7 +240,7 @@ const Store = () => {
                                         </div>
                                         <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                             <span style={{margin: '0 1%'}}>bis:</span>
-                                            <Select defaultValue={parseInt(editedData.openingTo)} style={{width: '90px'}}
+                                            <Select defaultValue={editedData.openingTo ? parseInt(editedData.openingTo) : undefined} style={{width: '90px'}}
                                                     onChange={value => handleInputChange('openingTo', value)}>
 
                                                 {Array.from({length: 24}, (_, i) => (

@@ -22,4 +22,5 @@ urlpatterns = [
     path('get-userinformation/', views.UserInformation.as_view(), name='get-userinformation'),
     path('get-businessinformation/', views.BusinessInformation.as_view(), name='get-businessinformation'),
     path('get-businesstypes/', views.BusinessTypesView.as_view(), name='get-businesstypes'),
+    path('get-business-settings/', views.BusinessSettings.as_view(), name='business-settings'),
 ]
